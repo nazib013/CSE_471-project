@@ -9,6 +9,7 @@ const ProductSchema = new mongoose.Schema({
   category: { type: String, default: 'General' },
   isSold: { type: Boolean, default: false },
   soldAt: { type: Date },
+  isApproved: { type: Boolean, default: false },
   buyerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
