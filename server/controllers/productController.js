@@ -36,7 +36,7 @@ exports.getMyProducts = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const filter = {};
+    const filter = {isApproved: true};
     if (req.query.category) filter.category = req.query.category;
     if (req.query.q && String(req.query.q).trim()) {
       const q = String(req.query.q).trim();
