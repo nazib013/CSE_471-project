@@ -14,7 +14,7 @@ const productRoutes = require('./routes/productRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-
+const donationRoutes = require('./routes/donationRoutes');
 // Models
 const User = require('./models/User');
 
@@ -30,7 +30,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/orders', orderRoutes);
-
+app.use('/api/donations', donationRoutes);
 // Utils: safe logging for secrets
 const maskMongoUri = (uri) => {
   if (!uri) return 'undefined';
