@@ -12,6 +12,8 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
       const res = await axios.post('/auth/login', { email, password });
       login({ ...res.data.user, token: res.data.token });
@@ -29,13 +31,14 @@ export default function Login() {
   };
 
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Login</h2>
+    <div className="center-auth">
+      <div className="auth-card">
+        <h2 className="auth-title">Welcome Back</h2>
+        <p className="auth-subtitle">Login to continue helping pets find a home.</p>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} className="form-grid">
           <input
-            style={styles.input}
+            className="input"
             placeholder="Email"
             type="email"
             value={email}
@@ -44,7 +47,7 @@ export default function Login() {
           />
 
           <input
-            style={styles.input}
+            className="input"
             placeholder="Password"
             type="password"
             value={password}
@@ -52,69 +55,17 @@ export default function Login() {
             required
           />
 
-          <button type="submit" style={styles.button}>
+          <button type="submit" className="btn btn-primary">
             Login
           </button>
         </form>
 
-        {error ? <p style={styles.error}>{error}</p> : null}
+        {error ? <p className="error-text">{error}</p> : null}
 
-        <p style={styles.text}>
-          Don't have account? <Link to="/register">Register</Link>
+        <p style={{ marginTop: 16, textAlign: 'center' }}>
+          Don&apos;t have an account? <Link to="/register">Register</Link>
         </p>
       </div>
     </div>
   );
 }
-
-const styles = {
-  wrapper: {
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '20px',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '420px',
-    background: '#fff',
-    padding: '32px',
-    borderRadius: '16px',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
-  },
-  title: {
-    margin: '0 0 20px',
-    textAlign: 'center',
-    color: '#1f2937',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '14px',
-  },
-  input: {
-    padding: '12px 14px',
-    borderRadius: '10px',
-    border: '1px solid #d1d5db',
-    fontSize: '16px',
-    outline: 'none',
-  },
-  button: {
-    padding: '12px',
-    border: 'none',
-    borderRadius: '10px',
-    background: '#2563eb',
-    color: '#fff',
-    fontSize: '16px',
-    cursor: 'pointer',
-  },
-  error: {
-    color: 'red',
-    marginTop: '12px',
-  },
-  text: {
-    marginTop: '16px',
-    textAlign: 'center',
-  },
-};
