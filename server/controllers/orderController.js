@@ -107,25 +107,46 @@ exports.getOrderById = async (req, res) => {
 
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { status, note, carrier, trackingNumber, eta } = req.body;
+    const Order = require('../models/Order');
+
     const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: 'Not found' });
 
-    if (status) order.status = status;
-    if (!order.deliveryTracking) order.deliveryTracking = { history: [] };
-    if (carrier) order.deliveryTracking.carrier = carrier;
-    if (trackingNumber) order.deliveryTracking.trackingNumber = trackingNumber;
-    if (eta) order.deliveryTracking.eta = eta;
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-    order.deliveryTracking.history.push({ status: status || order.status, note });
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    order.status = status;
+
+    // SAFE handling
+    if (!order.deliveryTracking) {
+      order.deliveryTracking = {};
+    }
+
+    if (!order.deliveryTracking.history) {
+      order.deliveryTracking.history = [];
+    }
+
+    order.deliveryTracking.history.push({
+      status,
+      date: new Date(),
+      note: "Updated by admin"
+    });
 
     await order.save();
+
     res.json(order);
+
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error("UPDATE ORDER ERROR:", err);
+    res.status(500).json({ message: "Failed to update order" });
   }
 };
-
 // Customer cancel order: revert sold status back to available
 exports.cancelOrder = async (req, res) => {
   try {

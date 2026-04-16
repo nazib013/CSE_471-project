@@ -25,17 +25,29 @@ export default function Navbar() {
           <Link to="/products" className={`nav-link ${isActive('/products') ? 'active' : ''}`}>
             Products
           </Link>
+
           <Link to="/orders" className={`nav-link ${isActive('/orders') ? 'active' : ''}`}>
             My Orders
           </Link>
+
+          <Link to="/donate" className={`nav-link ${isActive('/donate') ? 'active' : ''}`}>
+            Donate
+          </Link>
+
+          <Link to="/my-donations" className={`nav-link ${isActive('/my-donations') ? 'active' : ''}`}>
+            My Donations
+          </Link>
+
           <Link to="/cart" className={`nav-link ${isActive('/cart') ? 'active' : ''}`}>
             Cart{cartCount ? ` (${cartCount})` : ''}
           </Link>
+
           {user?.role === 'seller' && (
             <Link to="/seller" className={`nav-link ${isActive('/seller') ? 'active' : ''}`}>
               Seller
             </Link>
           )}
+
           {user?.role === 'admin' && (
             <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`}>
               Admin

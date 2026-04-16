@@ -14,6 +14,21 @@ const allowAdmin = (req, res, next) => {
   if (req.user?.role === 'admin') return next();
   return res.status(403).json({ message: 'Forbidden' });
 };
+
+// Admin: get all orders
+router.get('/', authMiddleware, allowAdmin, async (req, res) => {
+  try {
+    const Order = require('../models/Order');
+
+    const orders = await Order.find()
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err); // 👈 VERY IMPORTANT (so you see real error)
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
 router.patch('/:id/status', authMiddleware, allowAdmin, updateOrderStatus);
 
 module.exports = router;
