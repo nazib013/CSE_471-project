@@ -7,13 +7,26 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('customer');
+  
+  // 1. ADDED: New state variables for the extra info
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/auth/register', { name, email, password, role });
+      // 2. ADDED: Include phone and address in the data sent to the backend
+      await axios.post('/auth/register', { 
+        name, 
+        email, 
+        password, 
+        role, 
+        phone, 
+        address 
+      });
       alert('Registration successful. Please login.');
       navigate('/login');
     } catch (err) {
@@ -51,6 +64,26 @@ export default function Register() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          {/* 3. ADDED: Input for Phone Number */}
+          <input
+            className="input"
+            placeholder="Phone Number (e.g., 017...)"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+          />
+
+          {/* 4. ADDED: Input for Address */}
+          <input
+            className="input"
+            placeholder="Full Address"
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             required
           />
 

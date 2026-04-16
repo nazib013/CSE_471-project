@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 
 export default function AdminDashboard() {
+  const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [complaints, setComplaints] = useState([]);
@@ -12,14 +13,16 @@ export default function AdminDashboard() {
 
   async function fetchAll() {
     try {
-      const [usersRes, productsRes, complaintsRes] = await Promise.all([
+      const [usersRes, productsRes, complaintsRes, ordersRes] = await Promise.all([
         axios.get('/admin/users'),
         axios.get('/admin/products'),
         axios.get('/admin/complaints'),
+        axios.get('/orders'),
       ]);
       setUsers(usersRes.data);
       setProducts(productsRes.data);
       setComplaints(complaintsRes.data);
+      setOrders(ordersRes.data);
     } catch (err) {
       console.error(err);
     }
@@ -57,6 +60,29 @@ export default function AdminDashboard() {
     }
   }
 
+  async function approveOrder(id) {
+  try {
+    await axios.patch(`/orders/${id}/status`, {
+      status: "confirmed" // or "approved" based on your backend logic,
+      //note: "Approved by admin"
+    });
+
+    //alert("Order approved");
+    fetchAll(); // refresh data
+  } catch (err) {
+    console.error(err);
+    alert("Failed to approve order");
+  }
+}
+
+async function approveProduct(id) {
+  try {
+    await axios.patch(`/products/${id}/approve`);
+    fetchAll();
+  } catch (err) {
+    console.error(err);
+  }
+}
   return (
     <div className="page">
       <h1 className="hero-title">Admin Dashboard</h1>
@@ -133,6 +159,15 @@ export default function AdminDashboard() {
                   <td>{p.amount} Taka</td>
                   <td>{p.sellerId?.name || 'Unknown'}</td>
                   <td>
+                    {!p.isApproved && (
+        <button
+          className="btn btn-success"
+          onClick={() => approveProduct(p._id)}
+          style={{ marginRight: 10 }}
+        >
+          Approve
+        </button>
+      )}
                     <button className="btn btn-danger" onClick={() => deleteProduct(p._id)}>
                       Delete
                     </button>
@@ -162,6 +197,46 @@ export default function AdminDashboard() {
             ))}
           </div>
         )}
+        <h2 style={{ marginTop: 30 }}>Orders</h2>
+
+{orders.filter(order => order.status === "pending").map((order) => (
+  <div key={order._id} className="card" style={{ marginTop: 15, padding: 15 }}>
+    
+    <p><strong>Order ID:</strong> {order._id}</p>
+    <p><strong>User:</strong> {order.user?.name || "N/A"}</p>
+    <p><strong>Total:</strong> ${order.totalAmount}</p>
+
+    <p>
+      <strong>Status:</strong>{" "}
+      <span style={{ color: order.status === "approved" ? "green" : "orange" }}>
+        {order.status}
+      </span>
+    </p>
+
+    <p><strong>Items:</strong></p>
+    <ul>
+      {order.items && order.items.length > 0 ? (
+  order.items.map((item, index) => (
+    <li key={index}>
+      {item.name || item.product?.name || "Item"} × {item.quantity}
+    </li>
+  ))
+) : (
+  <li>No items</li>
+)}
+    </ul>
+
+    {order.status !== "approved" && (
+      <button
+        className="btn btn-success"
+        onClick={() => approveOrder(order._id)}
+      >
+        Approve
+      </button>
+    )}
+
+  </div>
+))}
       </div>
     </div>
   );
