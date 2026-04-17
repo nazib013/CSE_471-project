@@ -17,7 +17,28 @@ const OrderSchema = new mongoose.Schema(
     customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     items: { type: [OrderItemSchema], required: true },
     total: { type: Number, required: true },
-    status: { type: String, enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'], default: 'pending' },
+
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+      default: 'pending',
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed', 'cancelled'],
+      default: 'pending',
+    },
+
+    paymentGateway: {
+      type: String,
+      default: 'sslcommerz',
+    },
+
+    transactionId: String,
+    valId: String,
+    gatewayData: mongoose.Schema.Types.Mixed,
+
     deliveryTracking: {
       carrier: String,
       trackingNumber: String,
@@ -30,9 +51,11 @@ const OrderSchema = new mongoose.Schema(
         },
       ],
     },
+
     shipping: {
       name: String,
       email: String,
+      phone: String,
       address: String,
       city: String,
       country: String,

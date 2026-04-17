@@ -18,7 +18,7 @@ const donationRoutes = require('./routes/donationRoutes');
 const rssRoutes = require('./routes/rssRoutes');
 // Models
 const User = require('./models/User');
-
+const paymentRoutes = require('./routes/paymentRoutes');
 // Express app setup
 const app = express();
 app.use(cors());

@@ -4,16 +4,19 @@ import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function CheckoutPage() {
-  const { items, clear } = useCart();
+  const { items } = useCart();
   const navigate = useNavigate();
+
   const [shipping, setShipping] = useState({
     name: '',
     email: '',
+    phone: '',
     address: '',
     city: '',
     country: '',
     postalCode: '',
   });
+
   const [loading, setLoading] = useState(false);
 
   if (!items.length) {
@@ -28,14 +31,23 @@ export default function CheckoutPage() {
     setLoading(true);
     try {
       const payload = {
-        items: items.map((i) => ({ productId: i._id, quantity: i.quantity || 1 })),
+        items: items.map((i) => ({
+          productId: i._id,
+          quantity: i.quantity || 1,
+        })),
         shipping,
       };
-      const res = await axios.post('/orders', payload);
-      clear();
-      navigate(`/track/${res.data._id}`);
+
+      const res = await axios.post('/payments/start-order', payload);
+
+      if (res.data?.gatewayUrl) {
+        window.location.href = res.data.gatewayUrl;
+        return;
+      }
+
+      alert('Payment page could not be opened');
     } catch (e) {
-      alert('Failed to place order');
+      alert(e.response?.data?.message || 'Failed to start payment');
     } finally {
       setLoading(false);
     }
@@ -45,10 +57,10 @@ export default function CheckoutPage() {
     <div className="page-sm">
       <div className="card">
         <h1 className="hero-title" style={{ fontSize: 30 }}>Checkout</h1>
-        <p className="muted">Enter your shipping details and place the order.</p>
+        <p className="muted">Enter your shipping details and continue to payment.</p>
 
         <div className="form-grid" style={{ marginTop: 18 }}>
-          {['name', 'email', 'address', 'city', 'country', 'postalCode'].map((k) => (
+          {['name', 'email', 'phone', 'address', 'city', 'country', 'postalCode'].map((k) => (
             <input
               key={k}
               className="input"
@@ -61,8 +73,9 @@ export default function CheckoutPage() {
 
         <div className="btn-row" style={{ marginTop: 18 }}>
           <button className="btn btn-primary" disabled={loading} onClick={placeOrder}>
-            {loading ? 'Placing...' : 'Place Order'}
+            {loading ? 'Opening Payment...' : 'Proceed to Payment'}
           </button>
+
           <button className="btn btn-secondary" onClick={() => navigate('/cart')}>
             Back to Cart
           </button>
