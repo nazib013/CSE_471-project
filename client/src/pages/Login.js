@@ -30,42 +30,68 @@ export default function Login() {
   };
 
   return (
-    <div className="center-auth">
-      <div className="auth-card">
-        <h2 className="auth-title">Welcome Back</h2>
-        <p className="auth-subtitle">
-          Login to continue helping pets find a home.
-        </p>
+    <div className="wiz-login-page">
+      <div className="wiz-login-shell">
+        <div className="wiz-login-left">
+          <div className="wiz-login-badge">Pet Care Platform</div>
+          <h1 className="wiz-login-heading">
+            Welcome back to your pet care dashboard
+          </h1>
+          <p className="wiz-login-copy">
+            Manage adoptions, track donations, and stay connected with your
+            pet-loving community in one simple place.
+          </p>
 
-        <form onSubmit={handleSubmit} className="form-grid">
-          <input
-            className="input"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div className="wiz-login-points">
+            <div className="wiz-login-point">Find loving homes for pets</div>
+            <div className="wiz-login-point">Support animal care through donations</div>
+            <div className="wiz-login-point">Stay connected with a trusted pet community</div>
+          </div>
+        </div>
 
-          <input
-            className="input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <div className="wiz-login-card">
+          <p className="wiz-login-card-top">Sign in</p>
+          <h2 className="wiz-login-title">Welcome Back</h2>
+          <p className="wiz-login-subtitle">
+            Enter your email and password to continue.
+          </p>
 
-          <button type="submit" className="btn btn-primary">
-            Login
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="wiz-login-form">
+            <div className="wiz-field">
+              <label className="wiz-label">Email</label>
+              <input
+                className="wiz-input"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        {error && <p className="error-text">{error}</p>}
+            <div className="wiz-field">
+              <label className="wiz-label">Password</label>
+              <input
+                className="wiz-input"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-        <p style={{ marginTop: '16px', textAlign: 'center' }}>
-          Don't have an account? <Link to="/register">Register</Link>
-        </p>
+            <button type="submit" className="wiz-login-btn">
+              Login
+            </button>
+          </form>
+
+          {error && <p className="wiz-login-error">{error}</p>}
+
+          <p className="wiz-login-footer">
+            Don&apos;t have an account? <Link to="/register">Register</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
