@@ -15,7 +15,8 @@ import DonationPage from './pages/DonationPage';
 import MyDonations from './pages/MyDonations';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar'; 
+import Tips from './pages/Tips';
 
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
@@ -89,6 +90,14 @@ function App() {
             element={
               <PrivateRoute roles={['customer', 'seller', 'admin']}>
                 <MyDonations />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/tips"
+            element={
+              <PrivateRoute roles={['customer', 'seller', 'admin']}>
+                <Tips />
               </PrivateRoute>
             }
           />
