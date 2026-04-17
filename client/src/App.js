@@ -17,7 +17,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar'; 
 import Tips from './pages/Tips';
-
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
+import PaymentCancelled from './pages/PaymentCancelled';
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
@@ -57,6 +59,9 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track/:id" element={<TrackOrderPage />} />
+          <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
+          <Route path="/payment-failed" element={<PaymentFailed />} />
+          <Route path="/payment-cancelled" element={<PaymentCancelled />} />
 
           <Route
             path="/profile"
