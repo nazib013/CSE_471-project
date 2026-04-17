@@ -88,7 +88,7 @@ exports.createOrder = async (req, res) => {
 
 exports.getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ customerId: req.user._id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ customerId: req.user._id, status: { $ne: 'cancelled' } }).sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
