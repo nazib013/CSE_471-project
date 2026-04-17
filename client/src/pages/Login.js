@@ -12,7 +12,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     try {
       const res = await axios.post('/auth/login', { email, password });
@@ -34,13 +33,15 @@ export default function Login() {
     <div className="center-auth">
       <div className="auth-card">
         <h2 className="auth-title">Welcome Back</h2>
-        <p className="auth-subtitle">Login to continue helping pets find a home.</p>
+        <p className="auth-subtitle">
+          Login to continue helping pets find a home.
+        </p>
 
         <form onSubmit={handleSubmit} className="form-grid">
           <input
             className="input"
-            placeholder="Email"
             type="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -48,8 +49,8 @@ export default function Login() {
 
           <input
             className="input"
-            placeholder="Password"
             type="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -60,10 +61,10 @@ export default function Login() {
           </button>
         </form>
 
-        {error ? <p className="error-text">{error}</p> : null}
+        {error && <p className="error-text">{error}</p>}
 
-        <p style={{ marginTop: 16, textAlign: 'center' }}>
-          Don&apos;t have an account? <Link to="/register">Register</Link>
+        <p style={{ marginTop: '16px', textAlign: 'center' }}>
+          Don't have an account? <Link to="/register">Register</Link>
         </p>
       </div>
     </div>
