@@ -52,7 +52,7 @@ const handleSearch = (e) => {
   });
 
   setFilteredTips(filtered);
-};
+}; 
 
   console.log("Loading state:", loading);
 
