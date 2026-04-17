@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../context/CartContext'; 
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -40,6 +40,9 @@ export default function Navbar() {
 
           <Link to="/cart" className={`nav-link ${isActive('/cart') ? 'active' : ''}`}>
             Cart{cartCount ? ` (${cartCount})` : ''}
+          </Link>
+          <Link to="/tips" className={`nav-link ${isActive('/tips') ? 'active' : ''}`}>
+            Tips
           </Link>
 
           {user?.role === 'seller' && (
