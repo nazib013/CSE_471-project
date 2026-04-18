@@ -13,10 +13,11 @@ import MyOrders from './pages/MyOrders';
 import ProfilePage from './pages/ProfilePage';
 import DonationPage from './pages/DonationPage';
 import MyDonations from './pages/MyDonations';
+import NGODirectory from './pages/NGODirectory';
+import ShelterMap from './pages/ShelterMap';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import Navbar from './components/Navbar'; 
-import Tips from './pages/Tips';
+import Navbar from './components/Navbar';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import PaymentCancelled from './pages/PaymentCancelled';
@@ -90,22 +91,16 @@ function App() {
             }
           />
 
-          <Route
-            path="/my-donations"
+          <Route path="/my-donations"
             element={
               <PrivateRoute roles={['customer', 'seller', 'admin']}>
                 <MyDonations />
               </PrivateRoute>
             }
           />
-          <Route
-            path="/tips"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <Tips />
-              </PrivateRoute>
-            }
-          />
+
+          <Route path="/ngos" element={<NGODirectory />} />
+          <Route path="/shelter-map" element={<ShelterMap />} />
 
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
