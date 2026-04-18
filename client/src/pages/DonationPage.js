@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export default function DonationPage() {
   const navigate = useNavigate();
   
-  // Tab State: 'money', 'items', or 'request'
+  // Tab State: 'money', 'items', 'list', or 'request'
   const [activeTab, setActiveTab] = useState('money'); 
 
   // --- MONETARY DONATION STATES ---
@@ -19,7 +19,10 @@ export default function DonationPage() {
   const [itemTitle, setItemTitle] = useState('');
   const [itemDesc, setItemDesc] = useState('');
   const [itemLoading, setItemLoading] = useState(false);
+  
+  // --- LIST OF ITEMS STATES ---
   const [itemList, setItemList] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All'); // NEW: For filtering
 
   // --- REQUEST HELP STATES ---
   const [requestForm, setRequestForm] = useState({ itemNeeded: '', reason: '', urgency: 'Medium' });
@@ -39,7 +42,8 @@ export default function DonationPage() {
 
   // Fetch data based on tab
   useEffect(() => {
-    if (activeTab === 'items') {
+    // Fetch items when either the donation form or the list tab is open
+    if (activeTab === 'items' || activeTab === 'list') {
       fetchItems();
     } else if (activeTab === 'request') {
       fetchMyRequests();
@@ -91,7 +95,7 @@ export default function DonationPage() {
     }
   };
 
-  // --- ITEM HANDLERS (FIXED) ---
+  // --- ITEM HANDLERS ---
   const handleItemSubmit = async (e) => {
     e.preventDefault();
     setItemLoading(true); 
@@ -106,7 +110,7 @@ export default function DonationPage() {
 
       await axios.post('/donations/items', payload);
       
-      setSuccess('Item donated successfully!');
+      setSuccess('Item donated successfully! Check the List of Items tab to see it.');
       
       setItemTitle(''); 
       setItemDesc('');
@@ -138,6 +142,11 @@ export default function DonationPage() {
     }
   };
 
+  // --- FILTER LOGIC ---
+  const filteredItems = selectedCategory === 'All' 
+    ? itemList 
+    : itemList.filter(item => item.category === selectedCategory);
+
   return (
     <div className="page-sm">
       <div className="card shadow-lg">
@@ -157,6 +166,12 @@ export default function DonationPage() {
             onClick={() => setActiveTab('items')}
           >
             Donate Items (AI)
+          </button>
+          <button 
+            className={`btn ${activeTab === 'list' ? 'btn-primary' : 'btn-secondary'}`} 
+            onClick={() => setActiveTab('list')}
+          >
+            List of Item(s)
           </button>
           <button 
             className={`btn ${activeTab === 'request' ? 'btn-primary' : 'btn-secondary'}`} 
@@ -182,7 +197,6 @@ export default function DonationPage() {
               ))}
             </div>
             
-            {/* FIXED: Removed the extra > bracket right here */}
             <form onSubmit={handleMoneySubmit} className="form-grid" style={{ marginTop: 18 }}>
               <div>
                 <label className="muted">Amount</label>
@@ -202,25 +216,54 @@ export default function DonationPage() {
           </div>
         )}
 
-        {/* --- TAB CONTENT: ITEMS --- */}
+        {/* --- TAB CONTENT: DONATE ITEMS FORM --- */}
         {activeTab === 'items' && (
           <div>
+            <p className="muted" style={{ marginBottom: 15 }}>Tell us what you are donating, and our AI will automatically categorize it for the community.</p>
             <form onSubmit={handleItemSubmit} className="form-grid">
-              <input className="input" required placeholder="Item Title" value={itemTitle} onChange={(e) => setItemTitle(e.target.value)} />
-              <textarea className="textarea" required placeholder="Description (condition, etc.)" value={itemDesc} onChange={(e) => setItemDesc(e.target.value)} />
+              <input className="input" required placeholder="Item Title (e.g., Puppy Milk)" value={itemTitle} onChange={(e) => setItemTitle(e.target.value)} />
+              <textarea className="textarea" required placeholder="Description (condition, quantity, etc.)" value={itemDesc} onChange={(e) => setItemDesc(e.target.value)} />
               <button className="btn btn-primary" type="submit" disabled={itemLoading}>{itemLoading ? 'AI Categorizing...' : 'Submit Items'}</button>
             </form>
-            <h3 style={{ marginTop: 30 }}>Recent Item Donations</h3>
+          </div>
+        )}
+
+        {/* --- TAB CONTENT: NEW LIST OF ITEMS --- */}
+        {activeTab === 'list' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0 }}>Community Donations</h3>
+              <select 
+                className="select" 
+                style={{ width: 'auto', minWidth: '150px' }} 
+                value={selectedCategory} 
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="All">All Categories</option>
+                <option value="Food">Food</option>
+                <option value="Medicine">Medicine</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
             <div className="grid">
-              {itemList.map(item => (
-                <div key={item._id} className="card" style={{ borderLeft: '4px solid #4f46e5', background: '#f8fbff', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <strong>{item.title}</strong>
-                    <span className="badge" style={{ background: '#eef2ff', color: '#4f46e5' }}>{item.category}</span>
+              {filteredItems.length > 0 ? (
+                filteredItems.map(item => (
+                  <div key={item._id} className="card" style={{ borderLeft: '4px solid #4f46e5', background: '#f8fbff', marginBottom: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{item.title}</strong>
+                      <span className="badge" style={{ background: '#eef2ff', color: '#4f46e5' }}>{item.category}</span>
+                    </div>
+                    <p style={{ fontSize: '14px', margin: '8px 0' }}>{item.description}</p>
+                    <small className="muted">Donated by: {item.userId?.name || 'Anonymous'}</small>
                   </div>
-                  <p style={{ fontSize: '14px' }}>{item.description}</p>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="muted" style={{ textAlign: 'center', padding: '20px 0' }}>
+                  No items found in the "{selectedCategory}" category.
+                </p>
+              )}
             </div>
           </div>
         )}
