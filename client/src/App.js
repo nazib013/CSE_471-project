@@ -17,6 +17,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar'; 
 import Tips from './pages/Tips';
+import TipDetail from "./pages/TipDetail";
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import PaymentCancelled from './pages/PaymentCancelled';
@@ -62,6 +63,7 @@ function App() {
           <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+          <Route path="/tips/:id" element={<TipDetail />} />
 
           <Route
             path="/profile"
