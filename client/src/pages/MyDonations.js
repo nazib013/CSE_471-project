@@ -46,7 +46,7 @@ export default function MyDonations() {
             <tbody>
               {moneyHistory.map(don => (
                 <tr key={don._id} style={{ borderBottom: '1px solid #fafafa' }}>
-                  <td style={{ padding: '10px', color: '#10b981', fontWeight: 'bold' }}>{don.amount} TK</td>
+                  <td style={{ padding: '10px', color: '#065f46', fontWeight: 'bold' }}>{don.amount} TK</td>
                   <td>{don.purpose}</td>
                   <td className="muted">{new Date(don.createdAt).toLocaleDateString()}</td>
                 </tr>

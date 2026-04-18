@@ -17,9 +17,13 @@ const orderRoutes = require('./routes/orderRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const rssRoutes = require('./routes/rssRoutes');
 const requestRoutes = require('./routes/requestRoutes');
+const ngoRoutes = require('./routes/ngoRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const tipsRoutes = require('./routes/tipsRoutes'); // Extracted inline require
+
 // Models
 const User = require('./models/User');
-const paymentRoutes = require('./routes/paymentRoutes');
+
 // Express app setup
 const app = express();
 app.use(cors());
@@ -34,46 +38,40 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/rss', rssRoutes);
-app.use("/api/tips", require("./routes/tipsRoutes"));
+app.use('/api/tips', tipsRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/ngos', ngoRoutes);
+app.use('/api/payments', paymentRoutes);
+
 // Utils: safe logging for secrets
 const maskMongoUri = (uri) => {
   if (!uri) return 'undefined';
   try {
-    // URL supports custom protocols; this will work for mongodb+srv
     const u = new URL(uri);
     const auth = u.username ? `${u.username}:${u.password ? '***' : ''}@` : '';
     return `${u.protocol}//${auth}${u.host}${u.pathname}`;
   } catch (_) {
-    // Fallback masking
     return uri.replace(/:\/\/.*@/, '://***@');
   }
 };
 
-// Utils: sanitize a MongoDB URI by trimming quotes, removing placeholder angle brackets
-// around credentials, and URL-encoding username/password to handle special characters
+// Utils: sanitize a MongoDB URI
 const sanitizeMongoUri = (uri) => {
   if (!uri || typeof uri !== 'string') return uri;
-  // Trim surrounding quotes/spaces
   let raw = uri.trim().replace(/^['"]|['"]$/g, '');
   try {
     const u = new URL(raw);
-    // Clean up username/password
     const clean = (v) => {
       if (v == null) return v;
-      // Remove common placeholder wrappers like <...>
       let s = String(v).replace(/^<+|>+$/g, '');
-      // Avoid double-encoding: first decode if encoded, then encode
       try { s = decodeURIComponent(s); } catch (_) { /* ignore */ }
       return encodeURIComponent(s);
     };
     if (u.username) u.username = clean(u.username);
     if (u.password) u.password = clean(u.password);
-    // Preserve original search/hash
     const out = `${u.protocol}//${u.username}${u.password ? ':' + u.password : ''}@${u.host}${u.pathname}${u.search}${u.hash}`;
     return out;
   } catch (_) {
-    // If it cannot be parsed by URL (e.g., very malformed), return the raw trimmed value
     return raw;
   }
 };
@@ -107,13 +105,12 @@ const createAdminIfNotExists = async () => {
       return;
     }
 
-    // Ensure user has admin role and the password from .env
     let changed = false;
     if (user.role !== 'admin') {
       user.role = 'admin';
       changed = true;
     }
-    // Always reset to the configured password to guarantee known credentials
+    
     user.password = hashedPassword;
     changed = true;
 
@@ -128,10 +125,10 @@ const createAdminIfNotExists = async () => {
   }
 };
 
-// Robust connect with retry to avoid immediate process exit
+// Robust connect with retry
 let serverStarted = false;
 let attempt = 0;
-const MAX_DELAY_MS = 30000; // cap backoff at 30s
+const MAX_DELAY_MS = 30000;
 
 const startHttpServer = () => {
   if (serverStarted) return;
@@ -151,24 +148,19 @@ const connectWithRetry = () => {
     setTimeout(connectWithRetry, delay);
     return;
   }
-  // If raw env had placeholders, we already stripped them, but still warn once for visibility
+  
   if (/[<>]/.test(process.env.MONGODB_URI || '')) {
     console.warn('⚠️ Detected < or > in original MONGODB_URI. Placeholders were removed and credentials URL-encoded for connection. Consider fixing .env.');
   }
 
   attempt += 1;
   console.log(`🔌 Connecting to MongoDB (attempt ${attempt})...`);
-  mongoose
-    .connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      // You can set dbName in URI or here via options
-    })
+  
+  // Removed deprecated options for newer Mongoose versions
+  mongoose.connect(uri)
     .then(() => {
       console.log('✅ Connected to MongoDB');
-      // Ensure admin after DB connection
       createAdminIfNotExists();
-      // Start HTTP server once DB is ready
       startHttpServer();
     })
     .catch((err) => {
@@ -180,7 +172,7 @@ const connectWithRetry = () => {
         .filter(Boolean)
         .join(' ');
       console.error('❌ MongoDB connection error:', details);
-      const backoff = Math.min(1000 * Math.pow(2, Math.min(attempt - 1, 5)), MAX_DELAY_MS); // 1s,2s,4s,8s,16s,32s cap 30s
+      const backoff = Math.min(1000 * Math.pow(2, Math.min(attempt - 1, 5)), MAX_DELAY_MS); 
       console.log(`⏳ Retrying in ${Math.round(backoff / 1000)}s...`);
       setTimeout(connectWithRetry, backoff);
     });
@@ -188,7 +180,7 @@ const connectWithRetry = () => {
 
 connectWithRetry();
 
-// Basic global error handlers to avoid silent exits
+// Basic global error handlers
 process.on('unhandledRejection', (reason) => {
   console.error('unhandledRejection:', reason);
 });

@@ -13,13 +13,20 @@ import MyOrders from './pages/MyOrders';
 import ProfilePage from './pages/ProfilePage';
 import DonationPage from './pages/DonationPage';
 import MyDonations from './pages/MyDonations';
+import DonationPaymentSuccess from './pages/DonationPaymentSuccess';
+import DonationPaymentFailed from './pages/DonationPaymentFailed';
+import DonationPaymentCancelled from './pages/DonationPaymentCancelled';
+import NGODirectory from './pages/NGODirectory';
+import ShelterMap from './pages/ShelterMap';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar'; 
 import Tips from './pages/Tips';
+import TipDetail from "./pages/TipDetail";
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import PaymentCancelled from './pages/PaymentCancelled';
+
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
@@ -62,6 +69,7 @@ function App() {
           <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+          <Route path="/tips/:id" element={<TipDetail />} />
 
           <Route
             path="/profile"
@@ -98,14 +106,21 @@ function App() {
               </PrivateRoute>
             }
           />
+
           <Route
-            path="/tips"
+            path="/donation-payment-success/:donationId"
             element={
               <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <Tips />
+                <DonationPaymentSuccess />
               </PrivateRoute>
             }
           />
+
+          <Route path="/donation-payment-failed" element={<DonationPaymentFailed />} />
+          <Route path="/donation-payment-cancelled" element={<DonationPaymentCancelled />} />
+
+          <Route path="/ngos" element={<NGODirectory />} />
+          <Route path="/shelter-map" element={<ShelterMap />} />
 
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

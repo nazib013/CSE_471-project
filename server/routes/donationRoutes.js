@@ -5,19 +5,20 @@ const {
   getMyDonations, 
   createItemDonation, 
   getItemDonations,
-  getMyItemDonations 
+  getMyItemDonations
 } = require('../controllers/donationController');
 
+// FIX: Bulletproof import for protect middleware
 const authMiddleware = require('../middleware/authMiddleware');
 const protect = authMiddleware.protect || authMiddleware; 
 
-// Monetary Routes
-router.post('/', protect, createDonation);
+// Money Routes
+router.post('/', protect, createDonation); 
 router.get('/my-donations', protect, getMyDonations);
 
 // Item Routes
-router.post('/items', protect, createItemDonation);
-router.get('/items', protect, getItemDonations);
-router.get('/my-items', protect, getMyItemDonations);
+router.post('/items', protect, createItemDonation); 
+router.get('/items', protect, getItemDonations); 
+router.get('/my-items', protect, getMyItemDonations); 
 
 module.exports = router;
