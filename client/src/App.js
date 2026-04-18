@@ -69,6 +69,7 @@ function App() {
           <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+          <Route path="/tips" element={<Tips />} />
           <Route path="/tips/:id" element={<TipDetail />} />
 
           <Route

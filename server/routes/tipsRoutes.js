@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { getPetArticles } = require("../controllers/rssController");
-const authMiddleware = require("../middleware/authMiddleware");
+const { getPetArticles } = require("../controllers/tipsController");
 
-//router.get("/", authMiddleware, getPetArticles);
 router.get("/", getPetArticles);
+
 module.exports = router;

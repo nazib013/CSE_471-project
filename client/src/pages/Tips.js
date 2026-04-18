@@ -8,55 +8,55 @@ const Tips = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-useEffect(() => {
+  useEffect(() => {
     console.log("Fetching tips...");
+
     const fetchTips = async () => {
-    try {
-      setLoading(true); // 
+      try {
+        setLoading(true);
 
-      const token = localStorage.getItem("token");
+        // ✅ NO TOKEN (public API)
+        const res = await fetch("http://localhost:5000/api/tips");
 
-      const res = await fetch("http://localhost:5000/api/tips", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        if (!res.ok) {
+          console.error("Failed to fetch tips:", res.status);
+          setTips([]);
+          setFilteredTips([]);
+          return;
+        }
 
-      const data = await res.json();
+        const data = await res.json();
+        const articles = data.articles || [];
 
-      const articles = data.articles || [];
+        setTips(articles);
+        setFilteredTips(articles);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setTips(articles);
-      setFilteredTips(articles);
-    } catch (err) {
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false); 
-    }
-  };
-
-  fetchTips();
-}, []);
+    fetchTips();
+  }, []);
 
   // 🔍 SEARCH FUNCTION
-const handleSearch = (e) => {
-  const value = e.target.value;
-  setSearch(value);
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearch(value);
 
-  const filtered = tips.filter((item) => {
-    const title = item?.title || "";
-    const snippet = item?.contentSnippet || "";
+    const filtered = tips.filter((item) => {
+      const title = item?.title || "";
+      const snippet = item?.contentSnippet || "";
 
-    return (
-      title.toLowerCase().includes(value.toLowerCase()) ||
-      snippet.toLowerCase().includes(value.toLowerCase())
-    );
-  });
+      return (
+        title.toLowerCase().includes(value.toLowerCase()) ||
+        snippet.toLowerCase().includes(value.toLowerCase())
+      );
+    });
 
-  setFilteredTips(filtered);
-}; 
-
-  console.log("Loading state:", loading);
+    setFilteredTips(filtered);
+  };
 
   if (loading) return <h2>Loading Tips...</h2>;
 
@@ -71,11 +71,11 @@ const handleSearch = (e) => {
         value={search}
         onChange={handleSearch}
         style={{
-            padding: "10px",
-            width: "300px",
-            marginBottom: "20px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
+          padding: "10px",
+          width: "300px",
+          marginBottom: "20px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
         }}
       />
 
@@ -95,12 +95,14 @@ const handleSearch = (e) => {
           >
             <h3>{item.title}</h3>
             <p>{item.contentSnippet || "No description available"}</p>
+
+            {/* ✅ INTERNAL NAVIGATION */}
             <button
               onClick={() => navigate(`/tips/${index}`, { state: item })}
               style={{
                 marginTop: "10px",
                 padding: "6px 12px",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               Read more →
