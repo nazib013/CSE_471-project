@@ -1,107 +1,201 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from '../api/axios';
+import { useNavigate } from 'react-router-dom';
 
-export default function MyDonations() {
-  const [donations, setDonations] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function DonationPage() {
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    amount: '',
+    purpose: 'General Donation',
+    message: '',
+    donorName: '',
+    donorEmail: '',
+    donorPhone: '',
+  });
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchDonations();
-  }, []);
+  const presetAmounts = [100, 500, 1000, 2000];
 
-  const fetchDonations = async () => {
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handlePresetAmount = (value) => {
+    setForm((prev) => ({
+      ...prev,
+      amount: String(value),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!form.amount || Number(form.amount) <= 0) {
+      setError('Please enter a valid donation amount.');
+      return;
+    }
+
+    if (!form.donorName.trim() || !form.donorEmail.trim() || !form.donorPhone.trim()) {
+      setError('Please provide your name, email and phone number.');
+      return;
+    }
+
     try {
       setLoading(true);
-      const res = await axios.get('/donations/mine');
-      setDonations(res.data || []);
+
+      const res = await axios.post('/payments/start-donation', {
+        amount: Number(form.amount),
+        purpose: form.purpose,
+        message: form.message,
+        donor: {
+          name: form.donorName.trim(),
+          email: form.donorEmail.trim(),
+          phone: form.donorPhone.trim(),
+        },
+      });
+
+      if (res.data?.gatewayUrl) {
+        window.location.href = res.data.gatewayUrl;
+        return;
+      }
+
+      setError('Could not start payment. Please try again.');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load donations.');
+      setError(err.response?.data?.message || 'Donation payment start failed.');
     } finally {
       setLoading(false);
     }
   };
 
-  const totalAmount = donations.reduce((sum, d) => sum + Number(d.amount || 0), 0);
-
-  if (loading) {
-    return (
-      <div className="page-sm">
-        <div className="empty-state">Loading donations...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="page-sm">
-        <div className="card">
-          <div className="badge badge-danger">{error}</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="page-sm">
       <div className="card">
-        <h1 className="hero-title" style={{ fontSize: 30 }}>My Donations</h1>
-        <p className="muted">Here is your personal donation history.</p>
+        <h1 className="hero-title" style={{ fontSize: 32 }}>
+          Donate for Animal Care
+        </h1>
+        <p className="muted">
+          Your donation helps provide food, shelter, treatment, and rescue support.
+        </p>
 
-        <div className="grid grid-2" style={{ marginTop: 18 }}>
-          <div className="card" style={{ background: '#f8fbff' }}>
-            <strong>Total Donations</strong>
-            <div style={{ marginTop: 8 }}>{donations.length}</div>
-          </div>
-
-          <div className="card" style={{ background: '#f8fbff' }}>
-            <strong>Total Amount</strong>
-            <div style={{ marginTop: 8 }}>{totalAmount.toFixed(2)} Taka</div>
-          </div>
-        </div>
-      </div>
-
-      {donations.length === 0 ? (
-        <div className="empty-state" style={{ marginTop: 18 }}>
-          You have not made any donations yet.
-        </div>
-      ) : (
-        <div className="list" style={{ marginTop: 18 }}>
-          {donations.map((d) => (
-            <div className="card" key={d._id}>
-              <div className="split">
-                <div>
-                  <div><strong>Amount:</strong> {Number(d.amount).toFixed(2)} Taka</div>
-                  <div><strong>Purpose:</strong> {d.purpose}</div>
-                  <div><strong>Status:</strong> {d.status}</div>
-                  <div><strong>Date:</strong> {new Date(d.createdAt).toLocaleString()}</div>
-                </div>
-
-                <div>
-                  <span
-                    className={`badge ${
-                      d.status === 'completed'
-                        ? 'badge-success'
-                        : d.status === 'failed'
-                        ? 'badge-danger'
-                        : 'badge-warning'
-                    }`}
-                  >
-                    {d.status}
-                  </span>
-                </div>
-              </div>
-
-              {d.message && (
-                <div style={{ marginTop: 14 }}>
-                  <strong>Message:</strong>
-                  <div className="muted" style={{ marginTop: 6 }}>{d.message}</div>
-                </div>
-              )}
-            </div>
+        <div className="btn-row" style={{ marginTop: 16, flexWrap: 'wrap' }}>
+          {presetAmounts.map((amount) => (
+            <button
+              key={amount}
+              type="button"
+              className={`btn ${String(form.amount) === String(amount) ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={() => handlePresetAmount(amount)}
+            >
+              {amount} Taka
+            </button>
           ))}
         </div>
-      )}
+
+        <form onSubmit={handleSubmit} className="form" style={{ marginTop: 20 }}>
+          <div>
+            <label className="muted">Donation Amount</label>
+            <input
+              className="input"
+              type="number"
+              min="1"
+              step="1"
+              name="amount"
+              placeholder="Enter amount"
+              value={form.amount}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label className="muted">Your Name</label>
+            <input
+              className="input"
+              type="text"
+              name="donorName"
+              placeholder="Enter your full name"
+              value={form.donorName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label className="muted">Your Email</label>
+            <input
+              className="input"
+              type="email"
+              name="donorEmail"
+              placeholder="Enter your email"
+              value={form.donorEmail}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label className="muted">Your Phone</label>
+            <input
+              className="input"
+              type="text"
+              name="donorPhone"
+              placeholder="Enter your phone number"
+              value={form.donorPhone}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label className="muted">Purpose</label>
+            <select
+              className="input"
+              name="purpose"
+              value={form.purpose}
+              onChange={handleChange}
+            >
+              <option value="General Donation">General Donation</option>
+              <option value="Food Support">Food Support</option>
+              <option value="Shelter Support">Shelter Support</option>
+              <option value="Medical Support">Medical Support</option>
+              <option value="Emergency Treatment">Emergency Treatment</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="muted">Message (Optional)</label>
+            <textarea
+              className="textarea"
+              name="message"
+              placeholder="Write a short message"
+              value={form.message}
+              onChange={handleChange}
+            />
+          </div>
+
+          {error && (
+            <div className="badge badge-danger" style={{ width: 'fit-content' }}>
+              {error}
+            </div>
+          )}
+
+          <div className="btn-row">
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+              {loading ? 'Redirecting...' : 'Proceed to Donation Payment'}
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => navigate('/my-donations')}
+            >
+              View My Donations
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

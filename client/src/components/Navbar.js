@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext'; 
+import { useCart } from '../context/CartContext';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -34,15 +34,16 @@ export default function Navbar() {
             Donate
           </Link>
 
+          <Link to="/ngos" className={`nav-link ${isActive('/ngos') || isActive('/shelter-map') ? 'active' : ''}`}>
+            Shelters & NGOs
+          </Link>
+
           <Link to="/my-donations" className={`nav-link ${isActive('/my-donations') ? 'active' : ''}`}>
             My Donations
           </Link>
 
           <Link to="/cart" className={`nav-link ${isActive('/cart') ? 'active' : ''}`}>
             Cart{cartCount ? ` (${cartCount})` : ''}
-          </Link>
-          <Link to="/tips" className={`nav-link ${isActive('/tips') ? 'active' : ''}`}>
-            Tips
           </Link>
 
           {user?.role === 'seller' && (
