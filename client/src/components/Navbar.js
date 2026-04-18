@@ -45,6 +45,9 @@ export default function Navbar() {
           <Link to="/cart" className={`nav-link ${isActive('/cart') ? 'active' : ''}`}>
             Cart{cartCount ? ` (${cartCount})` : ''}
           </Link>
+          <Link to="/tips" className={`nav-link ${isActive('/tips') ? 'active' : ''}`}>
+            Tips
+          </Link>
 
           {user?.role === 'seller' && (
             <Link to="/seller" className={`nav-link ${isActive('/seller') ? 'active' : ''}`}>
