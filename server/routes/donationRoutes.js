@@ -1,16 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
-const {
-  createDonation,
-  getMyDonations,
-  getAllDonations,
-  getDonationSummary,
+const { 
+  createDonation, 
+  getMyDonations, 
+  createItemDonation, 
+  getItemDonations,
+  getMyItemDonations 
 } = require('../controllers/donationController');
 
-router.post('/', authMiddleware, createDonation);
-router.get('/mine', authMiddleware, getMyDonations);
-router.get('/', authMiddleware, getAllDonations);
-router.get('/summary/admin', authMiddleware, getDonationSummary);
+const authMiddleware = require('../middleware/authMiddleware');
+const protect = authMiddleware.protect || authMiddleware; 
+
+// Monetary Routes
+router.post('/', protect, createDonation);
+router.get('/my-donations', protect, getMyDonations);
+
+// Item Routes
+router.post('/items', protect, createItemDonation);
+router.get('/items', protect, getItemDonations);
+router.get('/my-items', protect, getMyItemDonations);
 
 module.exports = router;

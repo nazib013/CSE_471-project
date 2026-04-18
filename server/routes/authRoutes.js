@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-// 1. ADDED: addInfo to the import
-const { register, login, addInfo } = require('../controllers/authController');
+// 1. ADDED updateProfile to the import
+const { register, login, addInfo, updateProfile } = require('../controllers/authController');
 
 router.post('/register', register);
 router.post('/login', login);
-
-// 2. ADDED: The new route to handle profile updates
 router.put('/add-info/:id', addInfo);
+
+// 2. ADDED the route for editing basic profile info
+router.put('/update-profile/:id', updateProfile);
 
 module.exports = router;
