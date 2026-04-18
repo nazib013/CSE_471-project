@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
+import AdminNGOManager from '../components/AdminNGOManager';
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
@@ -395,6 +396,10 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+      <div style={{ marginTop: 40, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+        <AdminNGOManager />
+      </div>
+
     </div>
   );
 }

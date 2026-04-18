@@ -16,6 +16,8 @@ import MyDonations from './pages/MyDonations';
 import DonationPaymentSuccess from './pages/DonationPaymentSuccess';
 import DonationPaymentFailed from './pages/DonationPaymentFailed';
 import DonationPaymentCancelled from './pages/DonationPaymentCancelled';
+import NGODirectory from './pages/NGODirectory';
+import ShelterMap from './pages/ShelterMap';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
@@ -113,6 +115,9 @@ function App() {
 
           <Route path="/donation-payment-failed" element={<DonationPaymentFailed />} />
           <Route path="/donation-payment-cancelled" element={<DonationPaymentCancelled />} />
+
+          <Route path="/ngos" element={<NGODirectory />} />
+          <Route path="/shelter-map" element={<ShelterMap />} />
 
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

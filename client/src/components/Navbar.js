@@ -34,6 +34,10 @@ export default function Navbar() {
             Donate
           </Link>
 
+          <Link to="/ngos" className={`nav-link ${isActive('/ngos') || isActive('/shelter-map') ? 'active' : ''}`}>
+            Shelters & NGOs
+          </Link>
+
           <Link to="/my-donations" className={`nav-link ${isActive('/my-donations') ? 'active' : ''}`}>
             My Donations
           </Link>

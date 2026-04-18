@@ -66,7 +66,7 @@ export default function MyOrders() {
             <div className="card" key={o._id}>
               <div className="split">
                 <div>
-                  <div><strong>Order ID:</strong> {o._id}</div>
+                  <div><strong>Order ID:</strong> {"ORD-" + o._id.slice(-6)}</div>
                   <div><strong>Placed:</strong> {new Date(o.createdAt).toLocaleString()}</div>
                   <div><strong>Items:</strong> {o.items?.length || 0}</div>
                   <div><strong>Total:</strong> {Number(o.total || 0).toFixed(2)} Taka</div>

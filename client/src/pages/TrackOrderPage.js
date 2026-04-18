@@ -27,7 +27,7 @@ export default function TrackOrderPage() {
     <div className="page-sm">
       <div className="card">
         <h1 className="hero-title" style={{ fontSize: 28 }}>Order Tracking</h1>
-        <p><strong>Order ID:</strong> {order._id}</p>
+        <p><strong>Order ID:</strong> {"ORD-" + order._id.slice(-6)}</p>
         <p>
           <strong>Status:</strong>{' '}
           <span

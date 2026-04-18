@@ -15,6 +15,7 @@ const complaintRoutes = require('./routes/complaintRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const donationRoutes = require('./routes/donationRoutes');
+const ngoRoutes = require('./routes/ngoRoutes');
 // Models
 const User = require('./models/User');
 const paymentRoutes = require('./routes/paymentRoutes');
@@ -31,6 +32,7 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/donations', donationRoutes);
+app.use('/api/ngos', ngoRoutes);
 app.use('/api/payments', paymentRoutes);
 // Utils: safe logging for secrets
 const maskMongoUri = (uri) => {
