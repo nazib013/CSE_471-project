@@ -20,4 +20,4 @@ exports.getPetArticles = async (req, res) => {
       details: err.message
     });
   }
-};
+}; 
