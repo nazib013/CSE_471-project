@@ -1,6 +1,7 @@
 const axios = require('axios');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const Donation = require('../models/Donation');
 
 const toNum = (value) => {
   const n = Number(String(value || '').replace(/[^0-9.]/g, ''));
@@ -120,6 +121,9 @@ exports.startOrderPayment = async (req, res) => {
         },
       }
     );
+
+    console.log('SSLCommerz Response Status:', sslResponse.status);
+    console.log('SSLCommerz Response Data:', JSON.stringify(sslResponse.data, null, 2));
 
     if (!sslResponse.data || !sslResponse.data.GatewayPageURL) {
       return res.status(500).json({
@@ -241,5 +245,259 @@ exports.orderPaymentCancel = async (req, res) => {
 };
 
 exports.orderPaymentIpn = async (req, res) => {
-  return res.status(200).send('IPN received');
+  try {
+    const { val_id, tran_id } = req.body;
+
+    if (!val_id || !tran_id) {
+      return res.status(400).json({ message: 'Missing val_id or tran_id' });
+    }
+
+    const order = await Order.findOne({ transactionId: tran_id });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const validation = await validateSslPayment(val_id);
+
+    const paid =
+      validation &&
+      validation.status === 'VALIDATED' &&
+      Number(validation.amount) === Number(order.total);
+
+    if (paid) {
+      order.paymentStatus = 'paid';
+      order.status = 'confirmed';
+      order.valId = val_id;
+      order.gatewayData = validation;
+
+      if (!order.deliveryTracking) order.deliveryTracking = { history: [] };
+      if (!order.deliveryTracking.history) order.deliveryTracking.history = [];
+
+      const hasConfirmedHistory = order.deliveryTracking.history.some(
+        (item) => item.status === 'confirmed'
+      );
+
+      if (!hasConfirmedHistory) {
+        order.deliveryTracking.history.push({
+          status: 'confirmed',
+          note: 'Payment confirmed by IPN',
+        });
+      }
+
+      await order.save();
+    }
+
+    return res.status(200).json({ message: 'IPN received' });
+  } catch (err) {
+    console.error('orderPaymentIpn error:', err.response?.data || err.message);
+    return res.status(500).json({ message: 'IPN processing failed' });
+  }
+};
+
+exports.startDonationPayment = async (req, res) => {
+  try {
+    const { amount, purpose, message, donor } = req.body;
+
+    if (!amount || Number(amount) <= 0) {
+      return res.status(400).json({ message: 'Please provide a valid donation amount.' });
+    }
+
+    if (Number(amount) < 10) {
+      return res.status(400).json({ message: 'Minimum donation amount is 10 BDT.' });
+    }
+
+    if (!donor || !donor.name || !donor.email || !donor.phone) {
+      return res.status(400).json({ message: 'Name, email and phone are required.' });
+    }
+
+    const tranId = `DONATION_${Date.now()}`;
+
+    const donation = await Donation.create({
+      userId: req.user._id,
+      donor: {
+        name: donor.name,
+        email: donor.email,
+        phone: donor.phone,
+      },
+      amount: Number(amount),
+      purpose: purpose?.trim() || 'General Donation',
+      message: message?.trim() || '',
+      paymentMethod: 'sslcommerz',
+      paymentGateway: 'sslcommerz',
+      transactionId: tranId,
+      status: 'pending',
+    });
+
+    const payload = new URLSearchParams({
+      store_id: process.env.SSLCOMMERZ_STORE_ID,
+      store_passwd: process.env.SSLCOMMERZ_STORE_PASSWORD,
+      total_amount: Number(amount).toFixed(2),
+      currency: 'BDT',
+      tran_id: tranId,
+
+      success_url: `${process.env.SERVER_URL}/api/payments/donation/success`,
+      fail_url: `${process.env.SERVER_URL}/api/payments/donation/fail`,
+      cancel_url: `${process.env.SERVER_URL}/api/payments/donation/cancel`,
+      ipn_url: `${process.env.SERVER_URL}/api/payments/donation/ipn`,
+
+      cus_name: donor.name,
+      cus_email: donor.email,
+      cus_add1: 'Donation',
+      cus_city: 'Dhaka',
+      cus_postcode: '1200',
+      cus_country: 'Bangladesh',
+      cus_phone: donor.phone,
+
+      shipping_method: 'NO',
+      product_name: (purpose?.trim() || 'General Donation').slice(0, 255),
+      product_category: 'Donation',
+      product_profile: 'non-physical-goods',
+
+      value_a: String(donation._id),
+      value_b: String(req.user._id),
+    });
+
+    const sslResponse = await axios.post(
+      process.env.SSLCOMMERZ_SESSION_API,
+      payload.toString(),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+
+    console.log('SSLCommerz Response Status:', sslResponse.status);
+    console.log('SSLCommerz Response Data:', JSON.stringify(sslResponse.data, null, 2));
+
+    if (!sslResponse.data || !sslResponse.data.GatewayPageURL) {
+      await Donation.findByIdAndUpdate(donation._id, {
+        $set: {
+          status: 'failed',
+        },
+      });
+
+      return res.status(500).json({
+        message: 'Failed to create donation payment session',
+        gatewayResponse: sslResponse.data,
+      });
+    }
+
+    return res.json({
+      gatewayUrl: sslResponse.data.GatewayPageURL,
+      donationId: donation._id,
+    });
+  } catch (err) {
+    console.error('startDonationPayment error:', err.response?.data || err.message);
+    return res.status(500).json({ message: 'Donation payment session creation failed' });
+  }
+};
+
+exports.donationPaymentSuccess = async (req, res) => {
+  try {
+    const { val_id, tran_id } = req.body;
+
+    const donation = await Donation.findOne({ transactionId: tran_id });
+    if (!donation) {
+      return res.redirect(`${process.env.CLIENT_URL}/donation-payment-failed`);
+    }
+
+    const validation = await validateSslPayment(val_id);
+
+    const paid =
+      validation &&
+      validation.status === 'VALIDATED' &&
+      Number(validation.amount) === Number(donation.amount);
+
+    if (!paid) {
+      donation.status = 'failed';
+      donation.gatewayData = validation;
+      await donation.save();
+
+      return res.redirect(`${process.env.CLIENT_URL}/donation-payment-failed`);
+    }
+
+    donation.status = 'completed';
+    donation.valId = val_id;
+    donation.gatewayData = validation;
+    await donation.save();
+
+    return res.redirect(`${process.env.CLIENT_URL}/donation-payment-success/${donation._id}`);
+  } catch (err) {
+    console.error('donationPaymentSuccess error:', err.response?.data || err.message);
+    return res.redirect(`${process.env.CLIENT_URL}/donation-payment-failed`);
+  }
+};
+
+exports.donationPaymentFail = async (req, res) => {
+  try {
+    const { tran_id } = req.body;
+
+    await Donation.updateOne(
+      { transactionId: tran_id },
+      {
+        $set: {
+          status: 'failed',
+        },
+      }
+    );
+  } catch (err) {
+    console.error('donationPaymentFail error:', err.message);
+  }
+
+  return res.redirect(`${process.env.CLIENT_URL}/donation-payment-failed`);
+};
+
+exports.donationPaymentCancel = async (req, res) => {
+  try {
+    const { tran_id } = req.body;
+
+    await Donation.updateOne(
+      { transactionId: tran_id },
+      {
+        $set: {
+          status: 'cancelled',
+        },
+      }
+    );
+  } catch (err) {
+    console.error('donationPaymentCancel error:', err.message);
+  }
+
+  return res.redirect(`${process.env.CLIENT_URL}/donation-payment-cancelled`);
+};
+
+exports.donationPaymentIpn = async (req, res) => {
+  try {
+    const { val_id, tran_id } = req.body;
+
+    if (!val_id || !tran_id) {
+      return res.status(400).json({ message: 'Missing val_id or tran_id' });
+    }
+
+    const donation = await Donation.findOne({ transactionId: tran_id });
+
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
+    const validation = await validateSslPayment(val_id);
+
+    const paid =
+      validation &&
+      validation.status === 'VALIDATED' &&
+      Number(validation.amount) === Number(donation.amount);
+
+    if (paid) {
+      donation.status = 'completed';
+      donation.valId = val_id;
+      donation.gatewayData = validation;
+      await donation.save();
+    }
+
+    return res.status(200).json({ message: 'Donation IPN received' });
+  } catch (err) {
+    console.error('donationPaymentIpn error:', err.response?.data || err.message);
+    return res.status(500).json({ message: 'Donation IPN processing failed' });
+  }
 };

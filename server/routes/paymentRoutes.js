@@ -1,19 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
-const {
-  startOrderPayment,
-  orderPaymentSuccess,
-  orderPaymentFail,
-  orderPaymentCancel,
-  orderPaymentIpn,
-} = require('../controllers/paymentController');
+const auth = require('../middleware/authMiddleware');
+const paymentController = require('../controllers/paymentController');
 
-router.post('/start-order', authMiddleware, startOrderPayment);
+// ── ORDERS ──────────────────────────────────────────────────────────────────
 
-router.post('/order/success', orderPaymentSuccess);
-router.post('/order/fail', orderPaymentFail);
-router.post('/order/cancel', orderPaymentCancel);
-router.post('/order/ipn', orderPaymentIpn);
+// User starts payment session
+router.post('/order/start', auth, paymentController.startOrderPayment);
+
+// Gateway callbacks (Public)
+router.post('/order/success', paymentController.orderPaymentSuccess);
+router.post('/order/fail', paymentController.orderPaymentFail);
+router.post('/order/cancel', paymentController.orderPaymentCancel);
+router.post('/order/ipn', paymentController.orderPaymentIpn);
+
+// ── DONATIONS ───────────────────────────────────────────────────────────────
+
+// User starts donation payment session
+router.post('/donation/start', auth, paymentController.startDonationPayment);
+
+// Gateway callbacks (Public)
+router.post('/donation/success', paymentController.donationPaymentSuccess);
+router.post('/donation/fail', paymentController.donationPaymentFail);
+router.post('/donation/cancel', paymentController.donationPaymentCancel);
+router.post('/donation/ipn', paymentController.donationPaymentIpn);
 
 module.exports = router;

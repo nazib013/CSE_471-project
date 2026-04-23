@@ -31,4 +31,11 @@ router.delete('/user/:userId', authMiddleware, deleteUser);
 router.delete('/product/:productId', authMiddleware, deleteProduct);
 router.post('/product', authMiddleware, upload.single('image'), adminAddProduct);
 
+const { 
+  approveDonationRequest, 
+  fulfillDonationRequest 
+} = require('../controllers/adminController');
+
+router.patch('/requests/:id/approve', authMiddleware, approveDonationRequest);
+router.patch('/requests/:id/fulfill', authMiddleware, fulfillDonationRequest);
 module.exports = router;

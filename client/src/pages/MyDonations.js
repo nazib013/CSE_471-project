@@ -1,107 +1,79 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 
 export default function MyDonations() {
-  const [donations, setDonations] = useState([]);
+  const [moneyHistory, setMoneyHistory] = useState([]);
+  const [itemHistory, setItemHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchDonations();
+    const fetchHistory = async () => {
+      try {
+        const [moneyRes, itemRes] = await Promise.all([
+          axios.get('/donations'),
+          axios.get('/donations/my/items')
+        ]);
+        setMoneyHistory(moneyRes.data);
+        setItemHistory(itemRes.data);
+      } catch (err) {
+        console.error("Error loading history");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHistory();
   }, []);
 
-  const fetchDonations = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get('/donations/mine');
-      setDonations(res.data || []);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load donations.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const totalAmount = donations.reduce((sum, d) => sum + Number(d.amount || 0), 0);
-
-  if (loading) {
-    return (
-      <div className="page-sm">
-        <div className="empty-state">Loading donations...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="page-sm">
-        <div className="card">
-          <div className="badge badge-danger">{error}</div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="page-sm">Loading your contributions...</div>;
 
   return (
     <div className="page-sm">
-      <div className="card">
-        <h1 className="hero-title" style={{ fontSize: 30 }}>My Donations</h1>
-        <p className="muted">Here is your personal donation history.</p>
+      <h1 className="hero-title">My Contributions</h1>
+      <p className="muted">Track all the support you have provided to animals in need.</p>
 
-        <div className="grid grid-2" style={{ marginTop: 18 }}>
-          <div className="card" style={{ background: '#f8fbff' }}>
-            <strong>Total Donations</strong>
-            <div style={{ marginTop: 8 }}>{donations.length}</div>
-          </div>
-
-          <div className="card" style={{ background: '#f8fbff' }}>
-            <strong>Total Amount</strong>
-            <div style={{ marginTop: 8 }}>{totalAmount.toFixed(2)} Taka</div>
-          </div>
-        </div>
+      {/* --- MONEY SECTION --- */}
+      <div className="card shadow-sm" style={{ marginTop: 25 }}>
+        <h3>Monetary Donations</h3>
+        {moneyHistory.length === 0 ? <p>No monetary donations yet.</p> : (
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 10 }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left' }}>
+                <th style={{ padding: '10px' }}>Amount</th>
+                <th>Purpose</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {moneyHistory.map(don => (
+                <tr key={don._id} style={{ borderBottom: '1px solid #fafafa' }}>
+                  <td style={{ padding: '10px', color: '#065f46', fontWeight: 'bold' }}>{don.amount} TK</td>
+                  <td>{don.purpose}</td>
+                  <td className="muted">{new Date(don.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {donations.length === 0 ? (
-        <div className="empty-state" style={{ marginTop: 18 }}>
-          You have not made any donations yet.
-        </div>
-      ) : (
-        <div className="list" style={{ marginTop: 18 }}>
-          {donations.map((d) => (
-            <div className="card" key={d._id}>
-              <div className="split">
-                <div>
-                  <div><strong>Amount:</strong> {Number(d.amount).toFixed(2)} Taka</div>
-                  <div><strong>Purpose:</strong> {d.purpose}</div>
-                  <div><strong>Status:</strong> {d.status}</div>
-                  <div><strong>Date:</strong> {new Date(d.createdAt).toLocaleString()}</div>
+      {/* --- ITEMS SECTION --- */}
+      <div className="card shadow-sm" style={{ marginTop: 25 }}>
+        <h3>Items Donated</h3>
+        {itemHistory.length === 0 ? <p>No items donated yet.</p> : (
+          <div className="grid" style={{ marginTop: 10 }}>
+            {itemHistory.map(item => (
+              <div key={item._id} className="card" style={{ borderLeft: '4px solid #4f46e5', marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <strong>{item.title}</strong>
+                  <span className="badge">{item.category}</span>
                 </div>
-
-                <div>
-                  <span
-                    className={`badge ${
-                      d.status === 'completed'
-                        ? 'badge-success'
-                        : d.status === 'failed'
-                        ? 'badge-danger'
-                        : 'badge-warning'
-                    }`}
-                  >
-                    {d.status}
-                  </span>
-                </div>
+                <p style={{ fontSize: '13px', marginTop: 5 }}>{item.description}</p>
+                <small className="muted">{new Date(item.createdAt).toLocaleDateString()}</small>
               </div>
-
-              {d.message && (
-                <div style={{ marginTop: 14 }}>
-                  <strong>Message:</strong>
-                  <div className="muted" style={{ marginTop: 6 }}>{d.message}</div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

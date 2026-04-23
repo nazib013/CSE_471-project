@@ -11,14 +11,17 @@ function resolveBaseURL() {
   if (typeof window !== 'undefined' && window.location) {
     const { protocol, hostname } = window.location;
     // Preserve current page protocol (http or https) in case of dev over https via proxy
-    return `${protocol}//${hostname}:5000/api`;
+    return `${protocol}//${hostname}:5001/api`;
   }
 
-  return 'http://localhost:5000/api';
+  return 'http://localhost:5001/api';
 }
 
+const baseURL = resolveBaseURL();
+console.log('🔗 Axios baseURL:', baseURL);
+
 const instance = axios.create({
-  baseURL: resolveBaseURL(),
+  baseURL: baseURL,
 });
 
 instance.interceptors.request.use((config) => {

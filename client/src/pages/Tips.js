@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "../api/axios";
 
 const Tips = () => {
   const [tips, setTips] = useState([]);
   const [filteredTips, setFilteredTips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
 useEffect(() => {
     console.log("Fetching tips...");
     const fetchTips = async () => {
     try {
-      setLoading(true); // 
+      setLoading(true); 
 
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:5000/api/tips", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
+      const res = await axios.get("/tips");
+      const data = res.data;
 
       const articles = data.articles || [];
 
@@ -53,8 +49,6 @@ const handleSearch = (e) => {
 
   setFilteredTips(filtered);
 }; 
-
-  console.log("Loading state:", loading);
 
   if (loading) return <h2>Loading Tips...</h2>;
 
@@ -93,9 +87,16 @@ const handleSearch = (e) => {
           >
             <h3>{item.title}</h3>
             <p>{item.contentSnippet || "No description available"}</p>
-            <a href={item.link} target="_blank" rel="noreferrer">
+            <button
+              onClick={() => navigate(`/tips/${index}`, { state: item })}
+              style={{
+                marginTop: "10px",
+                padding: "6px 12px",
+                cursor: "pointer"
+              }}
+            >
               Read more →
-            </a>
+            </button>
           </div>
         ))
       )}

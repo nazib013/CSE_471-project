@@ -3,6 +3,7 @@ const Product = require('../models/Product');
 const Complaint = require('../models/Complaint');
 const path = require('path');
 
+
 exports.getAllUsers = async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
 
@@ -28,6 +29,7 @@ exports.getAllComplaints = async (req, res) => {
   const complaints = await Complaint.find().populate('userId', 'name email');
   res.json(complaints);
 };
+
 
 exports.promoteUserToAdmin = async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
@@ -94,5 +96,37 @@ exports.adminAddProduct = async (req, res) => {
     res.status(201).json(product);
   } catch (e) {
     res.status(500).json({ message: 'Server error', error: e.message });
+  }
+};
+// Add these at the very bottom of adminController.js
+const Request = require('../models/Request');
+
+exports.approveDonationRequest = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    const request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'approved' },
+      { new: true }
+    );
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    res.json(request);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+exports.fulfillDonationRequest = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    const request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'fulfilled' },
+      { new: true }
+    );
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    res.json(request);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext'; 
+import { useCart } from '../context/CartContext';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -32,6 +32,10 @@ export default function Navbar() {
 
           <Link to="/donate" className={`nav-link ${isActive('/donate') ? 'active' : ''}`}>
             Donate
+          </Link>
+
+          <Link to="/ngos" className={`nav-link ${isActive('/ngos') || isActive('/shelter-map') ? 'active' : ''}`}>
+            Shelters & NGOs
           </Link>
 
           <Link to="/my-donations" className={`nav-link ${isActive('/my-donations') ? 'active' : ''}`}>

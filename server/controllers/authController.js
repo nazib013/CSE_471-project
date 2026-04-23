@@ -2,9 +2,9 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// 1. REGISTER
 exports.register = async (req, res) => {
   try {
-    // 1. ADDED: Extract phone and address from the frontend request
     const { name, email, password, role, phone, address } = req.body;
     
     const existingUser = await User.findOne({ email });
@@ -12,7 +12,6 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // 2. ADDED: Pass phone and address to the new User object
     const user = new User({ 
         name, 
         email, 
@@ -30,6 +29,7 @@ exports.register = async (req, res) => {
   }
 };
 
+// 2. LOGIN
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -41,7 +41,6 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
     
-    // 3. ADDED: Include the new fields in the login response
     res.json({ 
         token, 
         user: { 
@@ -59,23 +58,46 @@ exports.login = async (req, res) => {
   }
 };
 
+// 3. ADD DYNAMIC INFO (+ Add button)
 exports.addInfo = async (req, res) => {
   try {
     const userId = req.params.id;
     const { additionalInfo } = req.body;
 
-    // Find the user and update their additionalInfo array
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { additionalInfo: additionalInfo },
-      { new: true } // This tells Mongoose to return the updated document
+      { new: true } 
     );
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json({ message: 'Profile updated successfully', additionalInfo: updatedUser.additionalInfo });
+    res.json({ message: 'Profile info added successfully', additionalInfo: updatedUser.additionalInfo });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error while adding info' });
+  }
+};
+
+// 4. UPDATE BASIC PROFILE (Edit button)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { name, phone, address } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, phone, address },
+      { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'Profile updated successfully', user: updatedUser });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error while updating profile' });

@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
+import AdminNGOManager from '../components/AdminNGOManager';
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [complaints, setComplaints] = useState([]);
+  const [donations, setDonations] = useState([]);
+  const [requests, setRequests] = useState([]); // New state for requests
+  const [donationSummary, setDonationSummary] = useState({
+    totalDonations: 0,
+    completedDonations: 0,
+    pendingDonations: 0,
+    failedDonations: 0,
+    cancelledDonations: 0,
+    totalAmount: 0,
+  });
 
   useEffect(() => {
     fetchAll();
@@ -13,164 +24,113 @@ export default function AdminDashboard() {
 
   async function fetchAll() {
     try {
-      const [usersRes, productsRes, complaintsRes, ordersRes] = await Promise.all([
+      const [
+        usersRes,
+        productsRes,
+        complaintsRes,
+        ordersRes,
+        donationsRes,
+        donationSummaryRes,
+        requestsRes, // Fetching requests
+      ] = await Promise.all([
         axios.get('/admin/users'),
         axios.get('/admin/products'),
         axios.get('/admin/complaints'),
         axios.get('/orders'),
+        axios.get('/donations/all/admin'),
+        axios.get('/donations/summary/admin'),
+        axios.get('/requests/all'),
       ]);
-      setUsers(usersRes.data);
-      setProducts(productsRes.data);
-      setComplaints(complaintsRes.data);
-      setOrders(ordersRes.data);
+
+      setUsers(usersRes.data || []);
+      setProducts(productsRes.data || []);
+      setComplaints(complaintsRes.data || []);
+      setOrders(ordersRes.data || []);
+      setDonations(donationsRes.data || []);
+      setDonationSummary(donationSummaryRes.data || {});
+      setRequests(requestsRes.data || []);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching admin data", err);
     }
   }
 
-  async function promoteUser(id) {
+  // Action: Approve (Pending -> Active)
+
+  const handleApproveRequest = async (id) => {
     try {
-      await axios.post(`/admin/promote/${id}`);
-      alert('User promoted to admin');
+      // Changed path to /admin/requests/
+      await axios.patch(`/admin/requests/${id}/approve`);
       fetchAll();
     } catch (err) {
-      alert('Failed to promote user');
+      alert("Error approving: " + err.message);
     }
-  }
+  };
 
-  async function deleteUser(id) {
-    if (!window.confirm('Are you sure you want to delete this user? This will remove their products too.')) return;
+  const handleFulfillRequest = async (id) => {
     try {
-      await axios.delete(`/admin/user/${id}`);
-      alert('User deleted');
+      // Changed path to /admin/requests/
+      await axios.patch(`/admin/requests/${id}/fulfill`);
       fetchAll();
     } catch (err) {
-      alert('Failed to delete user');
+      alert("Error completing: " + err.message);
     }
-  }
-
-  async function deleteProduct(id) {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
+  };
+  const updateDonationStatus = async (id, status) => {
     try {
-      await axios.delete(`/admin/product/${id}`);
-      alert('Product deleted');
+      await axios.patch(`/donations/${id}/status`, { status });
       fetchAll();
     } catch (err) {
-      alert('Failed to delete product');
+      console.error("Update failed");
     }
-  }
+  };
 
-  async function approveOrder(id) {
-  try {
-    await axios.patch(`/orders/${id}/status`, {
-      status: "confirmed" // or "approved" based on your backend logic,
-      //note: "Approved by admin"
-    });
+  const deleteDonation = async (id) => {
+    if (!window.confirm("Delete record?")) return;
+    try {
+      await axios.delete(`/donations/${id}`);
+      fetchAll();
+    } catch (err) {
+      console.error("Delete failed");
+    }
+  };
 
-    //alert("Order approved");
-    fetchAll(); // refresh data
-  } catch (err) {
-    console.error(err);
-    alert("Failed to approve order");
-  }
-}
-
-async function approveProduct(id) {
-  try {
-    await axios.patch(`/products/${id}/approve`);
-    fetchAll();
-  } catch (err) {
-    console.error(err);
-  }
-}
   return (
-    <div className="page">
-      <h1 className="hero-title">Admin Dashboard</h1>
-      <p className="muted">Manage users, products, and complaints.</p>
+    <div className="page" style={{ padding: '20px' }}>
+      <h1 className="hero-title">Admin Management Dashboard</h1>
 
-      <div className="kpi-grid" style={{ marginTop: 22 }}>
-        <div className="kpi-card">
-          <div className="kpi-label">Total Users</div>
-          <div className="kpi-value">{users.length}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-label">Total Products</div>
-          <div className="kpi-value">{products.length}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-label">Complaints</div>
-          <div className="kpi-value">{complaints.length}</div>
-        </div>
-      </div>
-
-      <div className="card" style={{ marginTop: 22 }}>
-        <h2 className="section-title">Users</h2>
-        <div className="table-wrap">
+      {/* --- DONATION REQUESTS SECTION (ACTIVE & HISTORY) --- */}
+      <div className="card shadow-sm" style={{ marginBottom: 30 }}>
+        <h3>Donation Requests Management</h3>
+        <p className="muted">Approve new requests or move completed ones to history.</p>
+        
+        <div className="table-responsive">
           <table className="table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u._id}>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>{u.role}</td>
-                  <td>
-                    <div className="btn-row">
-                      {u.role !== 'admin' && (
-                        <button className="btn btn-success" onClick={() => promoteUser(u._id)}>
-                          Promote
-                        </button>
-                      )}
-                      <button className="btn btn-danger" onClick={() => deleteUser(u._id)}>
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="card" style={{ marginTop: 22 }}>
-        <h2 className="section-title">Products</h2>
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Seller</th>
+                <th>User</th>
+                <th>Item Needed</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((p) => (
-                <tr key={p._id}>
-                  <td>{p.name}</td>
-                  <td>{p.amount} Taka</td>
-                  <td>{p.sellerId?.name || 'Unknown'}</td>
+              {requests.map(req => (
+                <tr key={req._id}>
+                  <td>{req.userId?.name || 'User'}</td>
+                  <td>{req.itemNeeded}</td>
                   <td>
-                    {!p.isApproved && (
-        <button
-          className="btn btn-success"
-          onClick={() => approveProduct(p._id)}
-          style={{ marginRight: 10 }}
-        >
-          Approve
-        </button>
-      )}
-                    <button className="btn btn-danger" onClick={() => deleteProduct(p._id)}>
-                      Delete
-                    </button>
+                    <span className={`badge ${req.status === 'approved' ? 'badge-primary' : req.status === 'fulfilled' ? 'badge-success' : 'badge-secondary'}`}>
+                      {req.status === 'approved' ? 'Active' : req.status}
+                    </span>
+                  </td>
+                  <td>
+                    {req.status === 'pending' && (
+                      <button className="btn btn-sm" onClick={() => handleApproveRequest(req._id)}>Approve</button>
+                    )}
+                    {req.status === 'approved' && (
+                      <button className="btn btn-primary btn-sm" onClick={() => handleFulfillRequest(req._id)}>Mark Completed</button>
+                    )}
+                    {req.status === 'fulfilled' && <span className="muted">In History</span>}
                   </td>
                 </tr>
               ))}
@@ -179,64 +139,54 @@ async function approveProduct(id) {
         </div>
       </div>
 
-      <div className="card" style={{ marginTop: 22 }}>
-        <h2 className="section-title">Complaints</h2>
-        {complaints.length === 0 ? (
-          <div className="empty-state">No complaints found.</div>
-        ) : (
-          <div className="list">
-            {complaints.map((c) => (
-              <div className="card" key={c._id} style={{ background: '#f8fbff' }}>
-                <div><strong>From:</strong> {c.userId?.name || 'Unknown'}</div>
-                <div><strong>Email:</strong> {c.userId?.email || 'No email'}</div>
-                <div style={{ marginTop: 8 }}>
-                  <strong>Message:</strong>
-                  <div className="muted" style={{ marginTop: 6 }}>{c.message}</div>
-                </div>
-              </div>
-            ))}
+      {/* --- EXISTING MONETARY DONATIONS --- */}
+      <div className="card shadow-sm">
+        <h3>Monetary Donations</h3>
+        {donations.length === 0 ? <p>No donations found.</p> : (
+          <div className="table-responsive">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Donor</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donations.map((d) => (
+                  <tr key={d._id}>
+                    <td>{d.donor?.name || 'N/A'}</td>
+                    <td>{d.amount} TK</td>
+                    <td><span className={`badge badge-${d.status}`}>{d.status}</span></td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '5px' }}>
+                        {d.status === 'pending' && (
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => updateDonationStatus(d._id, 'completed')}
+                          >
+                            Complete
+                          </button>
+                        )}
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => deleteDonation(d._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-        <h2 style={{ marginTop: 30 }}>Orders</h2>
+      </div>
 
-{orders.filter(order => order.status === "pending").map((order) => (
-  <div key={order._id} className="card" style={{ marginTop: 15, padding: 15 }}>
-    
-    <p><strong>Order ID:</strong> {order._id}</p>
-    <p><strong>User:</strong> {order.user?.name || "N/A"}</p>
-    <p><strong>Total:</strong> ${order.totalAmount}</p>
-
-    <p>
-      <strong>Status:</strong>{" "}
-      <span style={{ color: order.status === "approved" ? "green" : "orange" }}>
-        {order.status}
-      </span>
-    </p>
-
-    <p><strong>Items:</strong></p>
-    <ul>
-      {order.items && order.items.length > 0 ? (
-  order.items.map((item, index) => (
-    <li key={index}>
-      {item.name || item.product?.name || "Item"} × {item.quantity}
-    </li>
-  ))
-) : (
-  <li>No items</li>
-)}
-    </ul>
-
-    {order.status !== "approved" && (
-      <button
-        className="btn btn-success"
-        onClick={() => approveOrder(order._id)}
-      >
-        Approve
-      </button>
-    )}
-
-  </div>
-))}
+      <div style={{ marginTop: 40, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+        <AdminNGOManager />
       </div>
     </div>
   );
