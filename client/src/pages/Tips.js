@@ -16,7 +16,7 @@ const Tips = () => {
         setLoading(true);
 
         // ✅ NO TOKEN (public API)
-        const res = await fetch("http://localhost:5000/api/tips");
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/tips`);
 
         if (!res.ok) {
           console.error("Failed to fetch tips:", res.status);

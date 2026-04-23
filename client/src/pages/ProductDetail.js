@@ -33,7 +33,7 @@ export default function ProductDetail() {
         <div className="card">
           <div className="product-image-wrap" style={{ height: 380, borderRadius: 14, overflow: 'hidden' }}>
             {p.imageUrl ? (
-              <img src={`http://localhost:5000/${p.imageUrl}`} alt={p.name} className="product-image" />
+              <img src={`${process.env.REACT_APP_API_URL}/${p.imageUrl}`} alt={p.name} className="product-image" />
             ) : (
               <span className="muted">No image</span>
             )}

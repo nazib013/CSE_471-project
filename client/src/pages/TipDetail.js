@@ -10,7 +10,7 @@ const TipDetail = () => {
 
   useEffect(() => {
     if (!tip) {
-      fetch("http://localhost:5000/api/tips")
+      fetch(`${process.env.REACT_APP_API_URL}/api/tips`)
         .then(res => res.json())
         .then(data => {
           const found = data.articles?.[id];
