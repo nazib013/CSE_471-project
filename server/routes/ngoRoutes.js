@@ -12,6 +12,7 @@ const {
   getAllNGOsAdmin,
 } = require('../controllers/ngoController');
 
+<<<<<<< HEAD
 // ── SPECIFIC ROUTES FIRST ──────────────────────────────────────────────────
 
 // Public: Get all verified NGOs
@@ -38,6 +39,18 @@ router.put('/:id', auth, updateNGO);
 router.patch('/:id/verify', auth, toggleVerify);
 
 // Admin: Delete NGO
+=======
+// Public routes
+router.get('/', getAllNGOs);
+router.get('/nearby', getNearbyNGOs);
+router.get('/:id', getNGOById);
+
+// Admin-protected routes
+router.get('/admin/all', auth, getAllNGOsAdmin);
+router.post('/', auth, createNGO);
+router.put('/:id', auth, updateNGO);
+router.patch('/:id/verify', auth, toggleVerify);
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 router.delete('/:id', auth, deleteNGO);
 
 module.exports = router;

@@ -16,10 +16,17 @@ const adminRoutes = require('./routes/adminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const rssRoutes = require('./routes/rssRoutes');
+<<<<<<< HEAD
 const requestRoutes = require('./routes/requestRoutes'); // Handled here
 const ngoRoutes = require('./routes/ngoRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const tipsRoutes = require('./routes/tipsRoutes');
+=======
+const requestRoutes = require('./routes/requestRoutes');
+const ngoRoutes = require('./routes/ngoRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const tipsRoutes = require('./routes/tipsRoutes'); // Extracted inline require
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 
 // Models
 const User = require('./models/User');
@@ -52,11 +59,19 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/rss', rssRoutes);
 app.use('/api/tips', tipsRoutes);
+<<<<<<< HEAD
 app.use('/api/requests', requestRoutes); // Matches frontend /api/requests
 app.use('/api/ngos', ngoRoutes);
 app.use('/api/payments', paymentRoutes);
 
 // ─── UTILS: SAFE LOGGING & SANITIZATION ─────────────────────────────────
+=======
+app.use('/api/requests', requestRoutes);
+app.use('/api/ngos', ngoRoutes);
+app.use('/api/payments', paymentRoutes);
+
+// Utils: safe logging for secrets
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 const maskMongoUri = (uri) => {
   if (!uri) return 'undefined';
   try {
@@ -68,6 +83,10 @@ const maskMongoUri = (uri) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+// Utils: sanitize a MongoDB URI
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 const sanitizeMongoUri = (uri) => {
   if (!uri || typeof uri !== 'string') return uri;
   let raw = uri.trim().replace(/^['"]|['"]$/g, '');
@@ -81,7 +100,12 @@ const sanitizeMongoUri = (uri) => {
     };
     if (u.username) u.username = clean(u.username);
     if (u.password) u.password = clean(u.password);
+<<<<<<< HEAD
     return `${u.protocol}//${u.username}${u.password ? ':' + u.password : ''}@${u.host}${u.pathname}${u.search}${u.hash}`;
+=======
+    const out = `${u.protocol}//${u.username}${u.password ? ':' + u.password : ''}@${u.host}${u.pathname}${u.search}${u.hash}`;
+    return out;
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
   } catch (_) {
     return raw;
   }
@@ -120,6 +144,10 @@ const createAdminIfNotExists = async () => {
       user.role = 'admin';
       changed = true;
     }
+<<<<<<< HEAD
+=======
+    
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     user.password = hashedPassword;
     changed = true;
 
@@ -134,7 +162,11 @@ const createAdminIfNotExists = async () => {
   }
 };
 
+<<<<<<< HEAD
 // ─── SERVER STARTUP LOGIC ───────────────────────────────────────────────
+=======
+// Robust connect with retry
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 let serverStarted = false;
 let attempt = 0;
 const MAX_DELAY_MS = 30000;
@@ -155,25 +187,61 @@ const connectWithRetry = () => {
     setTimeout(connectWithRetry, 5000);
     return;
   }
+<<<<<<< HEAD
 
   attempt += 1;
   console.log(`🔌 Connecting to MongoDB (attempt ${attempt})...`);
   mongoose
     .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+=======
+  
+  if (/[<>]/.test(process.env.MONGODB_URI || '')) {
+    console.warn('⚠️ Detected < or > in original MONGODB_URI. Placeholders were removed and credentials URL-encoded for connection. Consider fixing .env.');
+  }
+
+  attempt += 1;
+  console.log(`🔌 Connecting to MongoDB (attempt ${attempt})...`);
+  
+  // Removed deprecated options for newer Mongoose versions
+  mongoose.connect(uri)
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     .then(() => {
       console.log('✅ Connected to MongoDB');
       createAdminIfNotExists();
       startHttpServer();
     })
     .catch((err) => {
+<<<<<<< HEAD
       console.error('❌ MongoDB connection error:', err.message);
       const backoff = Math.min(1000 * Math.pow(2, Math.min(attempt - 1, 5)), MAX_DELAY_MS);
+=======
+      const details = [
+        err && err.message ? err.message : String(err),
+        err && typeof err.code !== 'undefined' ? `(code: ${err.code})` : '',
+        err && err.codeName ? `(codeName: ${err.codeName})` : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      console.error('❌ MongoDB connection error:', details);
+      const backoff = Math.min(1000 * Math.pow(2, Math.min(attempt - 1, 5)), MAX_DELAY_MS); 
+      console.log(`⏳ Retrying in ${Math.round(backoff / 1000)}s...`);
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
       setTimeout(connectWithRetry, backoff);
     });
 };
 
 connectWithRetry();
 
+<<<<<<< HEAD
 // Global error handlers
 process.on('unhandledRejection', (reason) => console.error('unhandledRejection:', reason));
 process.on('uncaughtException', (err) => console.error('uncaughtException:', err));
+=======
+// Basic global error handlers
+process.on('unhandledRejection', (reason) => {
+  console.error('unhandledRejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('uncaughtException:', err);
+});
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06

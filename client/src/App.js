@@ -69,6 +69,10 @@ function App() {
           <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+<<<<<<< HEAD
+=======
+          <Route path="/tips" element={<Tips />} />
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
           <Route path="/tips/:id" element={<TipDetail />} />
 
           <Route
@@ -107,6 +111,7 @@ function App() {
             }
           />
 
+<<<<<<< HEAD
           <Route
             path="/donation-payment-success/:donationId"
             element={
@@ -121,14 +126,22 @@ function App() {
 
           <Route path="/ngos" element={<NGODirectory />} />
           <Route path="/shelter-map" element={<ShelterMap />} />
+=======
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
           <Route
-            path="/tips"
+            path="/donation-payment-success/:donationId"
             element={
               <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <Tips />
+                <DonationPaymentSuccess />
               </PrivateRoute>
             }
           />
+
+          <Route path="/donation-payment-failed" element={<DonationPaymentFailed />} />
+          <Route path="/donation-payment-cancelled" element={<DonationPaymentCancelled />} />
+
+          <Route path="/ngos" element={<NGODirectory />} />
+          <Route path="/shelter-map" element={<ShelterMap />} />
 
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>

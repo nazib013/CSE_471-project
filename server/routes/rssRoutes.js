@@ -1,8 +1,12 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const { createRequest, getMyRequests } = require('../controllers/requestController');
 
-const { getPetArticles } = require("../controllers/rssController");
+// Safety check for middleware import
+const authMiddleware = require('../middleware/authMiddleware');
+const protect = authMiddleware.protect || authMiddleware; 
 
-router.get("/pet-articles", getPetArticles);
+router.post('/', protect, createRequest);
+router.get('/my', protect, getMyRequests);
 
 module.exports = router;

@@ -4,7 +4,11 @@ const createRequest = async (req, res) => {
   try {
     const { itemNeeded, reason, urgency } = req.body;
     const newRequest = await Request.create({
+<<<<<<< HEAD
       userId: req.user._id,
+=======
+      userId: req.user._id, // Tied to the logged-in user
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
       itemNeeded,
       reason,
       urgency
@@ -24,6 +28,7 @@ const getMyRequests = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 const getAllRequests = async (req, res) => {
   try {
     const requests = await Request.find().populate('userId', 'name').sort({ createdAt: -1 });
@@ -76,3 +81,6 @@ module.exports = {
   approveRequest, 
   fulfillRequest 
 };
+=======
+module.exports = { createRequest, getMyRequests };
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06

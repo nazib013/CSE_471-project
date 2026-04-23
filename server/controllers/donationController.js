@@ -1,9 +1,19 @@
 const Donation = require('../models/Donation');
 const ItemDonation = require('../models/ItemDonation');
+<<<<<<< HEAD
 const { aiCategorize } = require('../utils/categorizer');
 
 // ─────────────────────────────────────────────
 // 1. MONEY: Create (Manual/Legacy)
+=======
+const axios = require('axios');
+
+// Helper function to create a pause/delay
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ─────────────────────────────────────────────
+// 1. MONEY: Create
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 // ─────────────────────────────────────────────
 exports.createDonation = async (req, res) => {
   try {
@@ -165,6 +175,7 @@ exports.deleteDonation = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
+<<<<<<< HEAD
 // 8. ITEMS: Create (AI Categorized)
 // ─────────────────────────────────────────────
 exports.createItemDonation = async (req, res) => {
@@ -179,16 +190,89 @@ exports.createItemDonation = async (req, res) => {
 
     console.log("Final Decision:", finalCategory);
 
+=======
+// 8. ITEMS: Create (AI Categorized with Retry)
+// ─────────────────────────────────────────────
+exports.createItemDonation = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    let aiCategory = 'Other'; 
+
+    const hfToken = process.env.HUGGING_FACE_TOKEN;
+
+    if (hfToken) {
+      let retries = 3; // We will try 3 times before giving up
+      let delayTime = 5000; // Wait 5 seconds between tries
+
+      while (retries > 0) {
+        try {
+          const response = await axios.post(
+            "https://api-inference.huggingface.co/models/facebook/bart-large-mnli",
+            {
+              inputs: `Donation: ${title}. Info: ${description}`,
+              parameters: { 
+                candidate_labels: ["animal food", "medical supplies", "pet accessories", "other"],
+                hypothesis_template: "This item is {}."
+              }
+            },
+            { 
+              headers: { Authorization: `Bearer ${hfToken}` },
+              timeout: 20000 // Give it plenty of time
+            }
+          );
+
+          // If the AI successfully replies, map the category and BREAK the loop
+          if (response.data && response.data.labels && response.data.labels.length > 0) {
+            const topLabel = response.data.labels[0];
+            
+            const labelMapping = {
+              "animal food": "Food",
+              "medical supplies": "Medicine",
+              "pet accessories": "Accessories",
+              "other": "Other"
+            };
+            
+            aiCategory = labelMapping[topLabel] || 'Other';
+            console.log(`✅ AI Successfully Categorized as: ${aiCategory}`);
+            break; // Success! Exit the retry loop.
+          }
+          
+        } catch (aiError) {
+          // If the model is sleeping (503 error), wait and try again
+          if (aiError.response && aiError.response.status === 503) {
+            console.log(`⏳ AI is asleep. Waiting 5 seconds... (${retries - 1} retries left)`);
+            await delay(delayTime);
+            retries--; // Reduce retry count
+          } else {
+            // If it's a different error (like a bad API key), log it and break
+            console.error("❌ AI Error:", aiError.response?.status || aiError.message);
+            break; 
+          }
+        }
+      }
+    } else {
+      console.log("⚠️ No Hugging Face token found in .env");
+    }
+
+    // Save the item to the database with the AI category (or "Other" if it ultimately failed)
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     const itemDonation = await ItemDonation.create({
       userId: req.user._id,
       title,
       description,
+<<<<<<< HEAD
       category: finalCategory,
+=======
+      category: aiCategory
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     });
 
     res.status(201).json(itemDonation);
   } catch (err) {
+<<<<<<< HEAD
     console.error("Critical error:", err);
+=======
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -213,6 +297,12 @@ exports.getMyItemDonations = async (req, res) => {
     const items = await ItemDonation.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.json(items);
   } catch (err) {
+<<<<<<< HEAD
     res.status(500).json({ message: 'Server error' });
   }
 };
+=======
+    res.status(500).json({ message: 'Server error', error: err.message }); // <-- Fixed this block
+  }
+};
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
