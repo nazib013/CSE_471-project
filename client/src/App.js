@@ -12,6 +12,10 @@ import ProductDetail from './pages/ProductDetail';
 import MyOrders from './pages/MyOrders';
 import ProfilePage from './pages/ProfilePage';
 import DonationPage from './pages/DonationPage';
+import DonateMoneyPage from './pages/DonateMoneyPage';
+import DonateItemsPage from './pages/DonateItemsPage';
+import RequestHelpPage from './pages/RequestHelpPage';
+import MyRequestsPage from './pages/MyRequestsPage';
 import MyDonations from './pages/MyDonations';
 import DonationPaymentSuccess from './pages/DonationPaymentSuccess';
 import DonationPaymentFailed from './pages/DonationPaymentFailed';
@@ -89,6 +93,30 @@ function App() {
           <Route path="/donate" element={
             <PrivateRoute roles={['customer','seller','admin']}>
               <DonationPage />
+            </PrivateRoute>
+          } />
+
+          <Route path="/donate/money" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <DonateMoneyPage />
+            </PrivateRoute>
+          } />
+
+          <Route path="/donate/items" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <DonateItemsPage />
+            </PrivateRoute>
+          } />
+
+          <Route path="/donate/request-help" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <RequestHelpPage />
+            </PrivateRoute>
+          } />
+
+          <Route path="/donate/my-requests" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <MyRequestsPage />
             </PrivateRoute>
           } />
 

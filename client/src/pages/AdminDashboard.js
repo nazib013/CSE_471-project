@@ -222,7 +222,7 @@ export default function AdminDashboard() {
           orders
             .filter((order) => order.status === 'pending')
             .map((order) => (
-              <div key={order._id} className="card" style={{ marginTop: 15, padding: 15, background: '#f8fbff' }}>
+              <div key={order._id} className="card" style={{ marginTop: 15, padding: 15, background: 'rgba(255, 255, 255, 0.52)' }}>
                 <p><strong>Order ID:</strong> {order._id}</p>
                 <p><strong>Customer:</strong> {order.shipping?.name || 'N/A'}</p>
                 <p><strong>Email:</strong> {order.shipping?.email || 'N/A'}</p>

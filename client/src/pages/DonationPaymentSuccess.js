@@ -38,7 +38,7 @@ export default function DonationPaymentSuccess() {
         )}
 
         {donation && (
-          <div className="card" style={{ marginTop: 18, background: '#f8fbff' }}>
+          <div className="card" style={{ marginTop: 18, background: 'rgba(255, 255, 255, 0.52)' }}>
             <div><strong>Donation ID:</strong> {donation._id}</div>
             <div><strong>Amount:</strong> {Number(donation.amount).toFixed(2)} Taka</div>
             <div><strong>Purpose:</strong> {donation.purpose}</div>

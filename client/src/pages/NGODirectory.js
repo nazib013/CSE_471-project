@@ -110,7 +110,7 @@ function NGOModal({ ngo, onClose }) {
     >
       <div
         style={{
-          background: '#fff', borderRadius: 18, padding: 28, maxWidth: 560,
+          background: 'rgba(255, 255, 255, 0.72)', borderRadius: 18, padding: 28, maxWidth: 560,
           width: '100%', maxHeight: '85vh', overflowY: 'auto', position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -149,7 +149,7 @@ function NGOModal({ ngo, onClose }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
           {ngo.phone && (
-            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.52)', borderRadius: 10, padding: '10px 14px' }}>
               <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 2 }}>PHONE</div>
               <a href={`tel:${ngo.phone}`} style={{ color: '#5b5ce6', fontWeight: 600 }}>
                 {ngo.phone}
@@ -157,7 +157,7 @@ function NGOModal({ ngo, onClose }) {
             </div>
           )}
           {ngo.email && (
-            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.52)', borderRadius: 10, padding: '10px 14px' }}>
               <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 2 }}>EMAIL</div>
               <a href={`mailto:${ngo.email}`} style={{ color: '#5b5ce6', fontWeight: 600, fontSize: 13 }}>
                 {ngo.email}
@@ -165,13 +165,13 @@ function NGOModal({ ngo, onClose }) {
             </div>
           )}
           {ngo.hours && (
-            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.52)', borderRadius: 10, padding: '10px 14px' }}>
               <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 2 }}>HOURS</div>
               <span style={{ fontWeight: 600, fontSize: 13 }}>{ngo.hours}</span>
             </div>
           )}
           {ngo.website && (
-            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.52)', borderRadius: 10, padding: '10px 14px' }}>
               <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 2 }}>WEBSITE</div>
               <a
                 href={ngo.website}

@@ -162,7 +162,7 @@ const TipDetail = () => {
           <h4 style={styles.sidebarHeading}>In this article</h4>
           <p style={styles.sidebarTitle}>{tip.title}</p>
           {formattedDate && <p style={styles.sidebarMeta}>📅 {formattedDate}</p>}
-          <hr style={{ border: "none", borderTop: "1px solid #e5e7eb", margin: "16px 0" }} />
+          <hr style={{ border: "none", borderTop: "1px solid rgba(203, 213, 225, 0.65)", margin: "16px 0" }} />
           <p style={styles.sidebarNote}>
             This article is provided by our healthcare RSS feed and rendered fully inside our platform.
           </p>
@@ -329,7 +329,7 @@ const styles = {
     alignItems: "start",
   },
   sidebar: {
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.72)",
     borderRadius: "14px",
     padding: "24px 20px",
     boxShadow: "0 2px 12px rgba(15,23,42,0.07)",
@@ -361,7 +361,7 @@ const styles = {
   sidebarBackBtn: {
     width: "100%",
     padding: "9px 0",
-    background: "#f5f3ff",
+    background: "rgba(91, 92, 230, 0.10)",
     border: "1px solid #ede9fe",
     borderRadius: "8px",
     color: "#5b5ce6",
@@ -371,7 +371,7 @@ const styles = {
   },
   main: { minWidth: 0 },
   articleCard: {
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.72)",
     borderRadius: "16px",
     padding: "40px 48px",
     boxShadow: "0 2px 16px rgba(15,23,42,0.08)",
@@ -395,7 +395,7 @@ const styles = {
     lineHeight: "1.25",
   },
   articleMeta: { margin: 0, fontSize: "0.87rem", color: "#9ca3af" },
-  divider: { border: "none", borderTop: "1px solid #f3f4f6", margin: "24px 0" },
+  divider: { border: "none", borderTop: "1px solid rgba(203, 213, 225, 0.65)", margin: "24px 0" },
   emptyContent: { textAlign: "center", padding: "40px 0", color: "#9ca3af" },
   externalLink: {
     display: "inline-block",
@@ -437,9 +437,9 @@ const styles = {
   },
   scrollTopBtn: {
     padding: "10px 20px",
-    background: "#f9fafb",
+    background: "rgba(255, 255, 255, 0.52)",
     color: "#6b7280",
-    border: "1px solid #e5e7eb",
+    border: "1px solid rgba(203, 213, 225, 0.65)",
     borderRadius: "8px",
     fontWeight: "500",
     fontSize: "0.88rem",

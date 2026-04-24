@@ -34,7 +34,7 @@ const TipCard = ({ item, index, onRead }) => {
   return (
     <div
       style={{
-        background: "#fff",
+        background: "rgba(255, 255, 255, 0.72)",
         borderRadius: "16px",
         boxShadow: hovered
           ? "0 8px 32px rgba(91,92,230,0.18)"
@@ -381,7 +381,7 @@ const styles = {
   emptyState: {
     textAlign: "center",
     padding: "60px 20px",
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.72)",
     borderRadius: "16px",
     boxShadow: "0 2px 12px rgba(15,23,42,0.08)",
   },
@@ -389,7 +389,7 @@ const styles = {
   emptyTitle: { margin: "0 0 8px", color: "#1f2937", fontSize: "1.2rem" },
   emptySub: { margin: "0 0 24px", color: "#9ca3af", fontSize: "0.9rem" },
   skeletonCard: {
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.72)",
     borderRadius: "16px",
     padding: "28px",
     display: "flex",

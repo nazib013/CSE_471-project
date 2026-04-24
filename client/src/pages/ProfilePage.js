@@ -85,7 +85,7 @@ export default function ProfilePage() {
           
           {/* --- NEW: Toggle between Edit Form and View Mode --- */}
           {isEditing ? (
-            <form onSubmit={handleEditProfile} className="card" style={{ background: '#fff', border: '1px solid #ddd', gridColumn: '1 / -1' }}>
+            <form onSubmit={handleEditProfile} className="card" style={{ background: 'rgba(255, 255, 255, 0.72)', border: '1px solid rgba(255, 255, 255, 0.72)', gridColumn: '1 / -1' }}>
               <h3 style={{ marginBottom: 12 }}>Edit Basic Information</h3>
               
               <div style={{ marginBottom: 10 }}>
@@ -124,27 +124,27 @@ export default function ProfilePage() {
           ) : (
             <>
               {/* Base Info View Mode */}
-              <div className="card" style={{ background: '#f8fbff' }}>
+              <div className="card" style={{ background: 'rgba(255, 255, 255, 0.52)' }}>
                 <strong>Name</strong>
                 <div style={{ marginTop: 6 }}>{profileData.name}</div>
               </div>
 
-              <div className="card" style={{ background: '#f8fbff' }}>
+              <div className="card" style={{ background: 'rgba(255, 255, 255, 0.52)' }}>
                 <strong>Email</strong>
                 <div style={{ marginTop: 6 }}>{user.email}</div>
               </div>
 
-              <div className="card" style={{ background: '#f8fbff' }}>
+              <div className="card" style={{ background: 'rgba(255, 255, 255, 0.52)' }}>
                 <strong>Role</strong>
                 <div style={{ marginTop: 6, textTransform: 'capitalize' }}>{user.role}</div>
               </div>
 
-              <div className="card" style={{ background: '#f8fbff' }}>
+              <div className="card" style={{ background: 'rgba(255, 255, 255, 0.52)' }}>
                 <strong>Phone</strong>
                 <div style={{ marginTop: 6 }}>{profileData.phone || 'Not provided'}</div>
               </div>
 
-              <div className="card" style={{ background: '#f8fbff' }}>
+              <div className="card" style={{ background: 'rgba(255, 255, 255, 0.52)' }}>
                 <strong>Address</strong>
                 <div style={{ marginTop: 6 }}>{profileData.address || 'Not provided'}</div>
               </div>
@@ -170,7 +170,7 @@ export default function ProfilePage() {
               + Add More Info
             </button>
           ) : (
-            <form onSubmit={handleAddInfo} className="card" style={{ background: '#fff', border: '1px solid #ddd' }}>
+            <form onSubmit={handleAddInfo} className="card" style={{ background: 'rgba(255, 255, 255, 0.72)', border: '1px solid rgba(255, 255, 255, 0.72)' }}>
               <h3 style={{ marginBottom: 12 }}>Add New Information</h3>
               <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
                 <input
