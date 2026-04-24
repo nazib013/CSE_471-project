@@ -49,23 +49,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/seller"
-            element={
-              <PrivateRoute roles={['seller']}>
-                <SellerDashboard />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/seller" element={
+            <PrivateRoute roles={['seller']}>
+              <SellerDashboard />
+            </PrivateRoute>
+          } />
 
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute roles={['admin']}>
-                <AdminDashboard />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/admin" element={
+            <PrivateRoute roles={['admin']}>
+              <AdminDashboard />
+            </PrivateRoute>
+          } />
 
           <Route path="/products" element={<CustomerProducts />} />
           <Route path="/product" element={<ProductDetail />} />
@@ -80,50 +74,35 @@ function App() {
           <Route path="/tips" element={<Tips />} />
           <Route path="/tips/:id" element={<TipDetail />} />
 
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <ProfilePage />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/profile" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <ProfilePage />
+            </PrivateRoute>
+          } />
 
-          <Route
-            path="/orders"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <MyOrders />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/orders" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <MyOrders />
+            </PrivateRoute>
+          } />
 
-          <Route
-            path="/donate"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <DonationPage />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/donate" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <DonationPage />
+            </PrivateRoute>
+          } />
 
-          <Route
-            path="/my-donations"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <MyDonations />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/my-donations" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <MyDonations />
+            </PrivateRoute>
+          } />
 
-          <Route
-            path="/donation-payment-success/:donationId"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <DonationPaymentSuccess />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/donation-payment-success/:donationId" element={
+            <PrivateRoute roles={['customer','seller','admin']}>
+              <DonationPaymentSuccess />
+            </PrivateRoute>
+          } />
 
           <Route path="/donation-payment-failed" element={<DonationPaymentFailed />} />
           <Route path="/donation-payment-cancelled" element={<DonationPaymentCancelled />} />
@@ -133,6 +112,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
+
       </CartProvider>
     </AuthProvider>
   );
