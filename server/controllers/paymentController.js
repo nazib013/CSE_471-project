@@ -174,6 +174,7 @@ exports.orderPaymentSuccess = async (req, res) => {
     if (!order.deliveryTracking) {
       order.deliveryTracking = { history: [] };
     }
+
     if (!order.deliveryTracking.history) {
       order.deliveryTracking.history = [];
     }
@@ -367,12 +368,9 @@ exports.startDonationPayment = async (req, res) => {
       }
     );
 
-<<<<<<< HEAD
     console.log('SSLCommerz Response Status:', sslResponse.status);
     console.log('SSLCommerz Response Data:', JSON.stringify(sslResponse.data, null, 2));
 
-=======
->>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     if (!sslResponse.data || !sslResponse.data.GatewayPageURL) {
       await Donation.findByIdAndUpdate(donation._id, {
         $set: {
@@ -503,8 +501,4 @@ exports.donationPaymentIpn = async (req, res) => {
     console.error('donationPaymentIpn error:', err.response?.data || err.message);
     return res.status(500).json({ message: 'Donation IPN processing failed' });
   }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
