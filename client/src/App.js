@@ -20,17 +20,22 @@ import NGODirectory from './pages/NGODirectory';
 import ShelterMap from './pages/ShelterMap';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import Navbar from './components/Navbar'; 
+import Navbar from './components/Navbar';
 import Tips from './pages/Tips';
-import TipDetail from "./pages/TipDetail";
+import TipDetail from './pages/TipDetail';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 import PaymentCancelled from './pages/PaymentCancelled';
 
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
+
   if (!user) return <Navigate to="/login" />;
-  if (roles && !roles.includes(user.role)) return <Navigate to="/login" />;
+
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to="/login" />;
+  }
+
   return children;
 }
 
@@ -39,6 +44,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Navbar />
+
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -66,13 +72,12 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/track/:id" element={<TrackOrderPage />} />
+
           <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
-<<<<<<< HEAD
-=======
+
           <Route path="/tips" element={<Tips />} />
->>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
           <Route path="/tips/:id" element={<TipDetail />} />
 
           <Route
@@ -111,23 +116,6 @@ function App() {
             }
           />
 
-<<<<<<< HEAD
-          <Route
-            path="/donation-payment-success/:donationId"
-            element={
-              <PrivateRoute roles={['customer', 'seller', 'admin']}>
-                <DonationPaymentSuccess />
-              </PrivateRoute>
-            }
-          />
-
-          <Route path="/donation-payment-failed" element={<DonationPaymentFailed />} />
-          <Route path="/donation-payment-cancelled" element={<DonationPaymentCancelled />} />
-
-          <Route path="/ngos" element={<NGODirectory />} />
-          <Route path="/shelter-map" element={<ShelterMap />} />
-=======
->>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
           <Route
             path="/donation-payment-success/:donationId"
             element={
