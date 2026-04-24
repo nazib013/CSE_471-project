@@ -8,6 +8,7 @@ export default function DonationPaymentCancelled() {
         <h1 className="hero-title" style={{ fontSize: 30 }}>
           Donation Payment Cancelled
         </h1>
+
         <p className="muted">
           Your donation payment was cancelled before completion.
         </p>
@@ -23,8 +24,4 @@ export default function DonationPaymentCancelled() {
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06

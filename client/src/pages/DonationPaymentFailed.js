@@ -8,6 +8,7 @@ export default function DonationPaymentFailed() {
         <h1 className="hero-title" style={{ fontSize: 30 }}>
           Donation Payment Failed
         </h1>
+
         <p className="muted">
           Your donation payment could not be completed. Please try again.
         </p>
@@ -23,8 +24,4 @@ export default function DonationPaymentFailed() {
       </div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
