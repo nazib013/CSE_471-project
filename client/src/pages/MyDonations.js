@@ -10,8 +10,13 @@ export default function MyDonations() {
     const fetchHistory = async () => {
       try {
         const [moneyRes, itemRes] = await Promise.all([
+<<<<<<< HEAD
+          axios.get('/donations'),
+          axios.get('/donations/my/items')
+=======
           axios.get('/donations/my-donations'),
           axios.get('/donations/my-items')
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
         ]);
         setMoneyHistory(moneyRes.data);
         setItemHistory(itemRes.data);

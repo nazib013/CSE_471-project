@@ -12,9 +12,12 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Clear previous errors
 
     try {
+      console.log('Attempting login with:', { email, password });
       const res = await axios.post('/auth/login', { email, password });
+      console.log('Login response:', res.data);
       login({ ...res.data.user, token: res.data.token });
 
       if (res.data.user.role === 'seller') {
@@ -25,7 +28,10 @@ export default function Login() {
         navigate('/products');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error message:', err.message);
+      setError(err.response?.data?.message || err.message || 'Login failed');
     }
   };
 

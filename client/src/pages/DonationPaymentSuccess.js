@@ -57,4 +57,8 @@ export default function DonationPaymentSuccess() {
       </div>
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06

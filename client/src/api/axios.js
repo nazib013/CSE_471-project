@@ -1,15 +1,11 @@
 import axios from 'axios';
 
-// Determine API base URL with environment override and sensible fallbacks
+// Determine API base URL with environment override and sensible fallback
 function resolveBaseURL() {
   const envUrl = process.env.REACT_APP_API_URL && process.env.REACT_APP_API_URL.trim();
+
   if (envUrl) {
     return `${envUrl}/api`;
-  }
-
-  if (typeof window !== 'undefined' && window.location) {
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:5000/api`;
   }
 
   return 'http://localhost:5000/api';

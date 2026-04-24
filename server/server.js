@@ -16,10 +16,17 @@ const adminRoutes = require('./routes/adminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const rssRoutes = require('./routes/rssRoutes');
+<<<<<<< HEAD
+const requestRoutes = require('./routes/requestRoutes'); // Handled here
+const ngoRoutes = require('./routes/ngoRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const tipsRoutes = require('./routes/tipsRoutes');
+=======
 const requestRoutes = require('./routes/requestRoutes');
 const ngoRoutes = require('./routes/ngoRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const tipsRoutes = require('./routes/tipsRoutes'); // Extracted inline require
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 
 // Models
 const User = require('./models/User');
@@ -30,7 +37,20 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes middleware
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Animal Rescue & Adoption Platform API',
+    status: 'running',
+    version: '1.0.0'
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ─── ROUTES MIDDLEWARE ──────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/complaints', complaintRoutes);
@@ -39,11 +59,19 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/rss', rssRoutes);
 app.use('/api/tips', tipsRoutes);
+<<<<<<< HEAD
+app.use('/api/requests', requestRoutes); // Matches frontend /api/requests
+app.use('/api/ngos', ngoRoutes);
+app.use('/api/payments', paymentRoutes);
+
+// ─── UTILS: SAFE LOGGING & SANITIZATION ─────────────────────────────────
+=======
 app.use('/api/requests', requestRoutes);
 app.use('/api/ngos', ngoRoutes);
 app.use('/api/payments', paymentRoutes);
 
 // Utils: safe logging for secrets
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 const maskMongoUri = (uri) => {
   if (!uri) return 'undefined';
   try {
@@ -55,7 +83,10 @@ const maskMongoUri = (uri) => {
   }
 };
 
+<<<<<<< HEAD
+=======
 // Utils: sanitize a MongoDB URI
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 const sanitizeMongoUri = (uri) => {
   if (!uri || typeof uri !== 'string') return uri;
   let raw = uri.trim().replace(/^['"]|['"]$/g, '');
@@ -69,17 +100,20 @@ const sanitizeMongoUri = (uri) => {
     };
     if (u.username) u.username = clean(u.username);
     if (u.password) u.password = clean(u.password);
+<<<<<<< HEAD
+    return `${u.protocol}//${u.username}${u.password ? ':' + u.password : ''}@${u.host}${u.pathname}${u.search}${u.hash}`;
+=======
     const out = `${u.protocol}//${u.username}${u.password ? ':' + u.password : ''}@${u.host}${u.pathname}${u.search}${u.hash}`;
     return out;
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
   } catch (_) {
     return raw;
   }
 };
 
-// DEBUG: Show a masked version of the Mongo URI
 console.log('ℹ️ MONGODB_URI (masked):', maskMongoUri(sanitizeMongoUri(process.env.MONGODB_URI)));
 
-// Auto-create or update predefined admin user by email
+// ─── ADMIN BOOTSTRAP ────────────────────────────────────────────────────
 const createAdminIfNotExists = async () => {
   try {
     const email = process.env.ADMIN_EMAIL;
@@ -110,7 +144,10 @@ const createAdminIfNotExists = async () => {
       user.role = 'admin';
       changed = true;
     }
+<<<<<<< HEAD
+=======
     
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     user.password = hashedPassword;
     changed = true;
 
@@ -125,7 +162,11 @@ const createAdminIfNotExists = async () => {
   }
 };
 
+<<<<<<< HEAD
+// ─── SERVER STARTUP LOGIC ───────────────────────────────────────────────
+=======
 // Robust connect with retry
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 let serverStarted = false;
 let attempt = 0;
 const MAX_DELAY_MS = 30000;
@@ -133,7 +174,7 @@ const MAX_DELAY_MS = 30000;
 const startHttpServer = () => {
   if (serverStarted) return;
   serverStarted = true;
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.PORT || 5001; // Matches your error log port
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
@@ -142,12 +183,17 @@ const startHttpServer = () => {
 const connectWithRetry = () => {
   const uri = sanitizeMongoUri(process.env.MONGODB_URI);
   if (!uri) {
-    console.error('❌ MONGODB_URI is not set. Add it to your server/.env file.');
-    const delay = 5000;
-    console.log(`⏳ Retrying Mongo connection in ${delay / 1000}s...`);
-    setTimeout(connectWithRetry, delay);
+    console.error('❌ MONGODB_URI is not set.');
+    setTimeout(connectWithRetry, 5000);
     return;
   }
+<<<<<<< HEAD
+
+  attempt += 1;
+  console.log(`🔌 Connecting to MongoDB (attempt ${attempt})...`);
+  mongoose
+    .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+=======
   
   if (/[<>]/.test(process.env.MONGODB_URI || '')) {
     console.warn('⚠️ Detected < or > in original MONGODB_URI. Placeholders were removed and credentials URL-encoded for connection. Consider fixing .env.');
@@ -158,12 +204,17 @@ const connectWithRetry = () => {
   
   // Removed deprecated options for newer Mongoose versions
   mongoose.connect(uri)
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     .then(() => {
       console.log('✅ Connected to MongoDB');
       createAdminIfNotExists();
       startHttpServer();
     })
     .catch((err) => {
+<<<<<<< HEAD
+      console.error('❌ MongoDB connection error:', err.message);
+      const backoff = Math.min(1000 * Math.pow(2, Math.min(attempt - 1, 5)), MAX_DELAY_MS);
+=======
       const details = [
         err && err.message ? err.message : String(err),
         err && typeof err.code !== 'undefined' ? `(code: ${err.code})` : '',
@@ -174,12 +225,18 @@ const connectWithRetry = () => {
       console.error('❌ MongoDB connection error:', details);
       const backoff = Math.min(1000 * Math.pow(2, Math.min(attempt - 1, 5)), MAX_DELAY_MS); 
       console.log(`⏳ Retrying in ${Math.round(backoff / 1000)}s...`);
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
       setTimeout(connectWithRetry, backoff);
     });
 };
 
 connectWithRetry();
 
+<<<<<<< HEAD
+// Global error handlers
+process.on('unhandledRejection', (reason) => console.error('unhandledRejection:', reason));
+process.on('uncaughtException', (err) => console.error('uncaughtException:', err));
+=======
 // Basic global error handlers
 process.on('unhandledRejection', (reason) => {
   console.error('unhandledRejection:', reason);
@@ -187,3 +244,4 @@ process.on('unhandledRejection', (reason) => {
 process.on('uncaughtException', (err) => {
   console.error('uncaughtException:', err);
 });
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06

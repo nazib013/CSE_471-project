@@ -1,5 +1,11 @@
 const Donation = require('../models/Donation');
 const ItemDonation = require('../models/ItemDonation');
+<<<<<<< HEAD
+const { aiCategorize } = require('../utils/categorizer');
+
+// ─────────────────────────────────────────────
+// 1. MONEY: Create (Manual/Legacy)
+=======
 const axios = require('axios');
 
 // Helper function to create a pause/delay
@@ -7,6 +13,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ─────────────────────────────────────────────
 // 1. MONEY: Create
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
 // ─────────────────────────────────────────────
 exports.createDonation = async (req, res) => {
   try {
@@ -168,6 +175,22 @@ exports.deleteDonation = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
+<<<<<<< HEAD
+// 8. ITEMS: Create (AI Categorized)
+// ─────────────────────────────────────────────
+exports.createItemDonation = async (req, res) => {
+  console.log("!!! AI CATEGORIZATION STARTED !!!");
+  console.log("Data received:", req.body);
+  
+  try {
+    const { title, description } = req.body;
+    
+    // Use AI Categorizer utility
+    const finalCategory = await aiCategorize(title, description);
+
+    console.log("Final Decision:", finalCategory);
+
+=======
 // 8. ITEMS: Create (AI Categorized with Retry)
 // ─────────────────────────────────────────────
 exports.createItemDonation = async (req, res) => {
@@ -232,15 +255,24 @@ exports.createItemDonation = async (req, res) => {
     }
 
     // Save the item to the database with the AI category (or "Other" if it ultimately failed)
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     const itemDonation = await ItemDonation.create({
       userId: req.user._id,
       title,
       description,
+<<<<<<< HEAD
+      category: finalCategory,
+=======
       category: aiCategory
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     });
 
     res.status(201).json(itemDonation);
   } catch (err) {
+<<<<<<< HEAD
+    console.error("Critical error:", err);
+=======
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -265,6 +297,12 @@ exports.getMyItemDonations = async (req, res) => {
     const items = await ItemDonation.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.json(items);
   } catch (err) {
+<<<<<<< HEAD
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+=======
     res.status(500).json({ message: 'Server error', error: err.message }); // <-- Fixed this block
   }
 };
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06

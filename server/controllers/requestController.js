@@ -4,7 +4,11 @@ const createRequest = async (req, res) => {
   try {
     const { itemNeeded, reason, urgency } = req.body;
     const newRequest = await Request.create({
+<<<<<<< HEAD
+      userId: req.user._id,
+=======
       userId: req.user._id, // Tied to the logged-in user
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
       itemNeeded,
       reason,
       urgency
@@ -24,4 +28,59 @@ const getMyRequests = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+const getAllRequests = async (req, res) => {
+  try {
+    const requests = await Request.find().populate('userId', 'name').sort({ createdAt: -1 });
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Admin: Set status to 'approved' (Active)
+const approveRequest = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    
+    const request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'approved' },
+      { new: true }
+    );
+    
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    res.json(request);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Admin: Set status to 'fulfilled' (History)
+const fulfillRequest = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+
+    const request = await Request.findByIdAndUpdate(
+      req.params.id,
+      { status: 'fulfilled' },
+      { new: true }
+    );
+
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    res.json(request);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+module.exports = { 
+  createRequest, 
+  getMyRequests, 
+  getAllRequests, 
+  approveRequest, 
+  fulfillRequest 
+};
+=======
 module.exports = { createRequest, getMyRequests };
+>>>>>>> d915b9ccd4cb6385b3fbc6fee4459447cfb27c06
