@@ -150,7 +150,7 @@ export default function SellerDashboard() {
                 <div className="product-image-wrap">
                   {p.imageUrl ? (
                     <img
-                      src={`${process.env.REACT_APP_API_URL}/${p.imageUrl}`}
+                      src={`http://localhost:5000/${p.imageUrl}`}
                       alt={p.name}
                       className="product-image"
                     />

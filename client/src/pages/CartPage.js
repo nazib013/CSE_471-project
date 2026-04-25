@@ -24,7 +24,7 @@ export default function CartPage() {
           <div key={it._id} className="list-item">
             {it.imageUrl ? (
               <img
-                src={`${process.env.REACT_APP_API_URL}/${it.imageUrl}`}
+                src={`http://localhost:5000/${it.imageUrl}`}
                 alt={it.name}
                 className="thumb"
               />

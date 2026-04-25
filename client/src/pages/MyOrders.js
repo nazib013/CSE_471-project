@@ -95,7 +95,7 @@ export default function MyOrders() {
                       <div className="list-item" key={idx}>
                         {it.imageUrl ? (
                           <img
-                            src={`${process.env.REACT_APP_API_URL}/${it.imageUrl}`}
+                            src={`http://localhost:5000/${it.imageUrl}`}
                             alt={it.name}
                             className="thumb"
                           />
